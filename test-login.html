@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Login - WYD Quest Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        pre {
+            background: #333;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Teste de Login - WYD Quest Tracker</h1>
+    
+    <div class="test-section">
+        <h3>📋 Status do Sistema</h3>
+        <div id="system-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🔐 Teste de Login</h3>
+        <button onclick="testLogin()">🚀 Fazer Login</button>
+        <button onclick="checkSession()">🔍 Verificar Sessão</button>
+        <button onclick="clearSession()">🗑️ Limpar Sessão</button>
+        <div id="login-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Logs do Sistema</h3>
+        <button onclick="clearLogs()">🧹 Limpar Logs</button>
+        <pre id="logs"></pre>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://qhmgdguuxmnzpousatrn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFobWdkZ3V1eG1uenBvdXNhdHJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgxOTk3NjEsImV4cCI6MjA0Mzc3NTc2MX0.LYJBNOQqcEq1yGFU-DfWnFqHDMl3uGN4zIVR0b-OUZQ';
+
+        let supabase;
+        let logs = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            logs.push(logEntry);
+            console.log(logEntry);
+            updateLogsDisplay();
+        }
+
+        function updateLogsDisplay() {
+            document.getElementById('logs').textContent = logs.slice(-20).join('\n');
+        }
+
+        function clearLogs() {
+            logs = [];
+            updateLogsDisplay();
+        }
+
+        function updateSystemStatus() {
+            const status = {
+                'URL Atual': window.location.href,
+                'Hash Params': window.location.hash || 'Nenhum',
+                'Supabase Loaded': !!window.supabase,
+                'Client Created': !!supabase,
+                'Current User': supabase ? 'Verificando...' : 'N/A'
+            };
+
+            let html = '<pre>';
+            for (const [key, value] of Object.entries(status)) {
+                html += `${key}: ${value}\n`;
+            }
+            html += '</pre>';
+
+            document.getElementById('system-status').innerHTML = html;
+
+            // Check current user if supabase is available
+            if (supabase) {
+                supabase.auth.getUser().then(({ data, error }) => {
+                    status['Current User'] = data.user ? data.user.email : 'Nenhum';
+                    status['Session Valid'] = !!data.user;
+                    
+                    let html = '<pre>';
+                    for (const [key, value] of Object.entries(status)) {
+                        html += `${key}: ${value}\n`;
+                    }
+                    html += '</pre>';
+                    document.getElementById('system-status').innerHTML = html;
+                });
+            }
+        }
+
+        async function testLogin() {
+            try {
+                log('Iniciando teste de login...');
+                
+                if (!supabase) {
+                    throw new Error('Supabase não inicializado');
+                }
+
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.href
+                    }
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                log('Login iniciado com sucesso');
+                document.getElementById('login-result').innerHTML = `
+                    <div style="color: #4CAF50;">
+                        ✅ Login iniciado! Você será redirecionado...
+                    </div>
+                `;
+
+            } catch (error) {
+                log(`Erro no login: ${error.message}`, 'error');
+                document.getElementById('login-result').innerHTML = `
+                    <div style="color: #f44336;">
+                        ❌ Erro: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        async function checkSession() {
+            try {
+                log('Verificando sessão...');
+                
+                if (!supabase) {
+                    throw new Error('Supabase não inicializado');
+                }
+
+                const { data, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    throw error;
+                }
+
+                log(`Sessão: ${data.session ? 'Válida' : 'Inválida'}`);
+                
+                if (data.session) {
+                    log(`Usuário: ${data.session.user.email}`);
+                    document.getElementById('login-result').innerHTML = `
+                        <div style="color: #4CAF50;">
+                            ✅ Sessão válida: ${data.session.user.email}
+                            <pre>${JSON.stringify(data.session.user.user_metadata, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('login-result').innerHTML = `
+                        <div style="color: #f39c12;">
+                            ⚠️ Nenhuma sessão ativa
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                log(`Erro ao verificar sessão: ${error.message}`, 'error');
+                document.getElementById('login-result').innerHTML = `
+                    <div style="color: #f44336;">
+                        ❌ Erro: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        async function clearSession() {
+            try {
+                log('Limpando sessão...');
+                
+                if (!supabase) {
+                    throw new Error('Supabase não inicializado');
+                }
+
+                const { error } = await supabase.auth.signOut();
+                
+                if (error) {
+                    throw error;
+                }
+
+                log('Sessão limpa com sucesso');
+                document.getElementById('login-result').innerHTML = `
+                    <div style="color: #4CAF50;">
+                        ✅ Sessão limpa com sucesso
+                    </div>
+                `;
+                
+                updateSystemStatus();
+
+            } catch (error) {
+                log(`Erro ao limpar sessão: ${error.message}`, 'error');
+                document.getElementById('login-result').innerHTML = `
+                    <div style="color: #f44336;">
+                        ❌ Erro: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Process auth from URL if present
+        function processAuthFromURL() {
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            const accessToken = hashParams.get('access_token');
+            const refreshToken = hashParams.get('refresh_token');
+            
+            if (accessToken && refreshToken) {
+                log('Tokens encontrados na URL, processando...');
+                
+                supabase.auth.setSession({
+                    access_token: accessToken,
+                    refresh_token: refreshToken
+                }).then(({ data, error }) => {
+                    if (error) {
+                        log(`Erro ao definir sessão: ${error.message}`, 'error');
+                    } else {
+                        log(`Sessão definida com sucesso: ${data.user?.email}`);
+                        
+                        // Clear URL hash
+                        history.replaceState(null, null, window.location.pathname);
+                        
+                        updateSystemStatus();
+                        checkSession();
+                    }
+                });
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            log('Página carregada, inicializando...');
+            
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                log('Cliente Supabase criado');
+                
+                // Set up auth state listener
+                supabase.auth.onAuthStateChange((event, session) => {
+                    log(`Auth state change: ${event}`);
+                    if (session?.user) {
+                        log(`Usuário: ${session.user.email}`);
+                    }
+                    updateSystemStatus();
+                });
+                
+                updateSystemStatus();
+                processAuthFromURL();
+                
+            } catch (error) {
+                log(`Erro na inicialização: ${error.message}`, 'error');
+            }
+        });
+    </script>
+</body>
+</html>
