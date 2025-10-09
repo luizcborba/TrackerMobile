@@ -1,4 +1,4 @@
-// Google Auth - Auto-detecta Ambiente (HTTPS = Google Auth, HTTP = Offline)
+// Google Auth - Versão Robusta com Fallbacks
 class CloudSync {
     constructor() {
         this.isSignedIn = false;
@@ -7,14 +7,16 @@ class CloudSync {
         this.syncInterval = null;
         this.clientId = '507473876859-o0urtsgjnetchqkqcf16ium53ejp1tts.apps.googleusercontent.com';
         
-        // Auto-detectar ambiente - CORRIGIDO PARA MOBILE
+        // Auto-detectar ambiente
         this.isHTTPS = window.location.protocol === 'https:';
         this.isGitHubPages = window.location.hostname === 'luizcborba.github.io';
         this.isLocalhost = window.location.hostname === 'localhost' || 
                           window.location.hostname === '127.0.0.1';
         
-        // Google Auth em HTTPS (incluindo mobile) ou localhost
+        // Google Auth em HTTPS ou localhost
         this.shouldUseGoogleAuth = this.isHTTPS || this.isLocalhost;
+        this.initAttempted = false;
+        this.fallbackMode = false;
     }
 
     async initGoogleAuth() {
@@ -24,55 +26,106 @@ class CloudSync {
         console.log('HTTPS:', this.isHTTPS);
         console.log('GitHub Pages:', this.isGitHubPages);
         console.log('Localhost:', this.isLocalhost);
-        console.log('User Agent:', navigator.userAgent);
         console.log('Deve usar Google Auth:', this.shouldUseGoogleAuth);
 
-        // Google Auth em qualquer HTTPS ou localhost (incluindo mobile)
         if (this.shouldUseGoogleAuth) {
-            console.log('✅ Ambiente compatível - Inicializando Google Auth');
-            await this.initRealGoogleAuth();
+            console.log('✅ Ambiente compatível - Tentando Google Auth');
+            await this.tryGoogleAuth();
         } else {
             console.log('ℹ️ Ambiente HTTP - Modo offline');
             this.initOfflineMode();
         }
     }
 
-    async initRealGoogleAuth() {
+    async tryGoogleAuth() {
+        if (this.initAttempted) return;
+        this.initAttempted = true;
+
         try {
-            // Carregar Google API
+            console.log('📡 Carregando Google API...');
             await this.loadGoogleAPI();
             
+            console.log('🔧 Inicializando Google Auth...');
+            await this.initRealGoogleAuth();
+            
+        } catch (error) {
+            console.log('❌ Google Auth falhou:', error);
+            
+            if (error.error === 'idpiframe_initialization_failed') {
+                console.log('🔄 Erro de iframe - tentando modo alternativo...');
+                await this.tryAlternativeAuth();
+            } else {
+                console.log('🔌 Fallback para modo offline');
+                this.initOfflineMode();
+            }
+        }
+    }
+
+    async tryAlternativeAuth() {
+        try {
+            console.log('🔄 Tentando inicialização alternativa...');
+            
+            // Método alternativo com configurações diferentes
             await new Promise((resolve, reject) => {
                 gapi.load('auth2', async () => {
                     try {
+                        // Configuração alternativa para contornar problemas de iframe
                         this.auth = await gapi.auth2.init({
                             client_id: this.clientId,
                             scope: 'profile email',
-                            hosted_domain: null,
                             fetch_basic_profile: true,
-                            ux_mode: 'popup'
+                            ux_mode: 'redirect', // Usar redirect ao invés de popup
+                            redirect_uri: window.location.origin + window.location.pathname
                         });
                         
                         this.auth.isSignedIn.listen(this.onSignInChange.bind(this));
                         this.updateSignInStatus();
                         this.updateUI();
                         
-                        console.log('✅ Google Auth inicializado com sucesso');
+                        console.log('✅ Autenticação alternativa funcionou!');
                         resolve();
-                    } catch (error) {
-                        console.error('❌ Erro ao inicializar Google Auth:', error);
-                        reject(error);
+                    } catch (altError) {
+                        console.log('❌ Método alternativo também falhou:', altError);
+                        reject(altError);
                     }
                 });
             });
+            
         } catch (error) {
-            console.error('❌ Erro fatal Google Auth:', error);
+            console.log('🔌 Todos os métodos falharam - modo offline');
             this.initOfflineMode();
         }
     }
 
+    async initRealGoogleAuth() {
+        await new Promise((resolve, reject) => {
+            gapi.load('auth2', async () => {
+                try {
+                    this.auth = await gapi.auth2.init({
+                        client_id: this.clientId,
+                        scope: 'profile email',
+                        hosted_domain: null,
+                        fetch_basic_profile: true,
+                        ux_mode: 'popup'
+                    });
+                    
+                    this.auth.isSignedIn.listen(this.onSignInChange.bind(this));
+                    this.updateSignInStatus();
+                    this.updateUI();
+                    
+                    console.log('✅ Google Auth inicializado');
+                    resolve();
+                } catch (error) {
+                    console.error('❌ Erro ao inicializar Google Auth:', error);
+                    reject(error);
+                }
+            });
+        });
+    }
+
     initOfflineMode() {
         console.log('🔌 Iniciando modo offline');
+        this.fallbackMode = true;
         this.updateUI();
     }
 
@@ -86,7 +139,10 @@ class CloudSync {
             const script = document.createElement('script');
             script.src = 'https://apis.google.com/js/api.js';
             script.onload = resolve;
-            script.onerror = reject;
+            script.onerror = () => {
+                console.log('❌ Falha ao carregar Google API');
+                reject(new Error('Falha ao carregar Google API'));
+            };
             document.head.appendChild(script);
         });
     }
@@ -96,7 +152,7 @@ class CloudSync {
         if (isSignedIn) {
             this.user = this.auth.currentUser.get();
             this.startSync();
-            showAchievement('✅ Login Google realizado! Dados sincronizados na nuvem.');
+            showAchievement('✅ Login Google realizado! Dados sincronizados.');
         } else {
             this.user = null;
             this.stopSync();
@@ -112,28 +168,34 @@ class CloudSync {
     }
 
     async signIn() {
-        if (!this.auth) {
-            // Modo offline
-            showAchievement('ℹ️ Modo offline. Acesse https://luizcborba.github.io/TrackerMobile/ para Google Auth.');
+        if (this.fallbackMode || !this.auth) {
+            // Modo offline ou auth não disponível
+            if (this.shouldUseGoogleAuth) {
+                showAchievement('⚠️ Google Auth não disponível. Verifique cookies de terceiros.');
+            } else {
+                showAchievement('ℹ️ Modo offline. Acesse via HTTPS para Google Auth.');
+            }
             return;
         }
 
         try {
-            console.log('🔐 Tentando login Google...');
+            console.log('🔐 Tentando login...');
             await this.auth.signIn();
         } catch (error) {
             console.error('❌ Erro no login:', error);
             
-            let message = '❌ Erro no login. ';
+            let message = '❌ Erro no login: ';
             
             if (error.error === 'popup_blocked_by_browser') {
-                message += 'Permita popups e tente novamente.';
+                message += 'Popup bloqueado. Permita popups.';
             } else if (error.error === 'access_denied') {
-                message += 'Acesso negado pelo usuário.';
+                message += 'Acesso negado.';
             } else if (error.error === 'redirect_uri_mismatch') {
-                message += 'Erro de configuração de URL. Verifique o Google Console.';
+                message += 'Erro de configuração de URL.';
+            } else if (error.error === 'idpiframe_initialization_failed') {
+                message += 'Problema com cookies. Tente permitir cookies de terceiros.';
             } else {
-                message += 'Detalhes: ' + (error.details || error.message || 'Erro desconhecido');
+                message += (error.details || error.message || 'Erro desconhecido');
             }
             
             showAchievement(message);
@@ -161,11 +223,10 @@ class CloudSync {
                 lastSync: new Date().toISOString()
             };
 
-            // Simulação de sync com localStorage
             const cloudKey = `cloud_${this.user.getId()}`;
             localStorage.setItem(cloudKey, JSON.stringify(userData));
             
-            console.log('☁️ Dados sincronizados na "nuvem"');
+            console.log('☁️ Dados sincronizados');
             this.showSyncIndicator();
         } catch (error) {
             console.error('❌ Erro ao sincronizar:', error);
@@ -243,16 +304,20 @@ class CloudSync {
             userInfo.style.display = 'block';
         } else {
             // Usuário não logado
-            if (this.shouldUseGoogleAuth && this.auth) {
-                // Google Auth disponível e carregado
+            if (this.auth && !this.fallbackMode) {
+                // Google Auth disponível
                 loginBtn.textContent = '🔐 Login Google';
                 loginBtn.style.background = 'linear-gradient(135deg, #4285f4, #34a853)';
-            } else if (this.shouldUseGoogleAuth && !this.auth) {
-                // Google Auth deve estar disponível mas ainda carregando
+            } else if (this.shouldUseGoogleAuth && !this.initAttempted) {
+                // Ainda carregando
                 loginBtn.textContent = '⏳ Carregando...';
                 loginBtn.style.background = 'linear-gradient(135deg, #f39c12, #e67e22)';
+            } else if (this.fallbackMode) {
+                // Fallback por problemas técnicos
+                loginBtn.textContent = '⚠️ Offline (Cookies?)';
+                loginBtn.style.background = 'linear-gradient(135deg, #e67e22, #d35400)';
             } else {
-                // Modo offline (HTTP)
+                // Modo offline normal
                 loginBtn.textContent = '🔌 Modo Offline';
                 loginBtn.style.background = 'linear-gradient(135deg, #6c757d, #495057)';
             }

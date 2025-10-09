@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuração Google Auth - WYD Tracker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .step {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }
+        .error-step {
+            border-left-color: #e74c3c;
+        }
+        .success-step {
+            border-left-color: #2ecc71;
+        }
+        .warning-step {
+            border-left-color: #f39c12;
+        }
+        .code {
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        button {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .browser-icon {
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        .accordion {
+            cursor: pointer;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        .accordion:hover {
+            background: rgba(0,0,0,0.3);
+        }
+        .panel {
+            display: none;
+            padding: 15px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        .active .panel {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Configuração Google Auth</h1>
+        <p>Guia para resolver o erro <code>idpiframe_initialization_failed</code></p>
+        
+        <div class="step error-step">
+            <h2>❌ Problema Identificado</h2>
+            <p><strong>Erro:</strong> <code>idpiframe_initialization_failed</code></p>
+            <p><strong>Causa:</strong> Cookies de terceiros bloqueados ou configurações de segurança</p>
+            <p><strong>Impacto:</strong> Google Auth não consegue criar iframe para autenticação</p>
+        </div>
+
+        <div class="step warning-step">
+            <h2>⚠️ Soluções por Navegador</h2>
+            
+            <div class="accordion" onclick="toggleAccordion(this)">
+                <h3>🌐 Google Chrome</h3>
+                <div class="panel">
+                    <ol>
+                        <li>Clique nos <strong>3 pontinhos</strong> (⋮) no canto superior direito</li>
+                        <li>Vá em <strong>Configurações</strong></li>
+                        <li>Na barra lateral, clique em <strong>Privacidade e segurança</strong></li>
+                        <li>Clique em <strong>Cookies e outros dados de sites</strong></li>
+                        <li>Escolha <strong>"Permitir todos os cookies"</strong> OU</li>
+                        <li>Em <strong>"Sites que sempre podem usar cookies"</strong>, adicione:
+                            <div class="code">https://accounts.google.com<br>https://luizcborba.github.io</div>
+                        </li>
+                        <li><strong>Recarregue</strong> a página do app</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="accordion" onclick="toggleAccordion(this)">
+                <h3>🦊 Firefox</h3>
+                <div class="panel">
+                    <ol>
+                        <li>Clique no <strong>menu</strong> (☰) no canto superior direito</li>
+                        <li>Vá em <strong>Configurações</strong></li>
+                        <li>Clique em <strong>Privacidade e Segurança</strong></li>
+                        <li>Em <strong>"Cookies e dados de sites"</strong>, clique em <strong>Gerenciar exceções</strong></li>
+                        <li>Adicione estas URLs como <strong>permitidas</strong>:
+                            <div class="code">https://accounts.google.com<br>https://luizcborba.github.io</div>
+                        </li>
+                        <li><strong>Recarregue</strong> a página</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="accordion" onclick="toggleAccordion(this)">
+                <h3>🔷 Microsoft Edge</h3>
+                <div class="panel">
+                    <ol>
+                        <li>Clique nos <strong>3 pontinhos</strong> (...) no canto superior direito</li>
+                        <li>Vá em <strong>Configurações</strong></li>
+                        <li>Clique em <strong>Cookies e permissões de site</strong></li>
+                        <li>Clique em <strong>Cookies e dados de sites</strong></li>
+                        <li>Em <strong>"Permitir"</strong>, adicione:
+                            <div class="code">https://accounts.google.com<br>https://luizcborba.github.io</div>
+                        </li>
+                        <li><strong>Recarregue</strong> a página</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="accordion" onclick="toggleAccordion(this)">
+                <h3>🍎 Safari (Mac/iOS)</h3>
+                <div class="panel">
+                    <ol>
+                        <li>Vá em <strong>Safari → Preferências</strong></li>
+                        <li>Clique na aba <strong>Privacidade</strong></li>
+                        <li>Desmarque <strong>"Bloquear todos os cookies"</strong></li>
+                        <li>OU configure <strong>"Websites"</strong> para permitir cookies do Google</li>
+                        <li><strong>Recarregue</strong> a página</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="step">
+            <h2>🧪 Teste Rápido</h2>
+            <p>Depois de configurar os cookies, teste aqui:</p>
+            <button onclick="testGoogleAuth()">🔐 Testar Google Auth</button>
+            <button onclick="checkCookies()">🍪 Verificar Cookies</button>
+            
+            <div id="testResult" style="margin-top: 15px;"></div>
+        </div>
+
+        <div class="step success-step">
+            <h2>✅ Solução Alternativa</h2>
+            <p>Se não conseguir habilitar cookies, o app funcionará em <strong>modo offline</strong>:</p>
+            <ul>
+                <li>✅ Todas as quests funcionam normalmente</li>
+                <li>✅ XP e progressão salvos localmente</li>
+                <li>✅ Notificações funcionam</li>
+                <li>❌ Sem sincronização entre dispositivos</li>
+            </ul>
+            <p><strong>Modo offline é totalmente funcional!</strong></p>
+        </div>
+
+        <div class="step">
+            <h2>🔄 Próximos Passos</h2>
+            <ol>
+                <li>Configure cookies conforme seu navegador acima</li>
+                <li>Recarregue a página: <a href="https://luizcborba.github.io/TrackerMobile/" style="color: #3498db;">WYD Tracker</a></li>
+                <li>Verifique se aparece "🔐 Login Google"</li>
+                <li>Teste o login</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function toggleAccordion(element) {
+            element.classList.toggle('active');
+        }
+
+        function testGoogleAuth() {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.innerHTML = '<p>🔄 Testando Google Auth...</p>';
+            
+            // Carregar Google API e testar
+            const script = document.createElement('script');
+            script.src = 'https://apis.google.com/js/api.js';
+            script.onload = () => {
+                gapi.load('auth2', async () => {
+                    try {
+                        const auth = await gapi.auth2.init({
+                            client_id: '507473876859-o0urtsgjnetchqkqcf16ium53ejp1tts.apps.googleusercontent.com',
+                            scope: 'profile email'
+                        });
+                        
+                        resultDiv.innerHTML = `
+                            <div style="padding: 15px; background: rgba(46, 204, 113, 0.2); border-radius: 10px; border-left: 4px solid #2ecc71;">
+                                <h3>✅ Google Auth Funcionando!</h3>
+                                <p>Cookies configurados corretamente. Você pode usar o login Google.</p>
+                                <button onclick="window.open('https://luizcborba.github.io/TrackerMobile/', '_blank')" style="margin-top: 10px;">
+                                    🚀 Abrir WYD Tracker
+                                </button>
+                            </div>
+                        `;
+                    } catch (error) {
+                        let errorMsg = '';
+                        if (error.error === 'idpiframe_initialization_failed') {
+                            errorMsg = 'Cookies de terceiros ainda bloqueados. Siga as instruções acima.';
+                        } else {
+                            errorMsg = `Erro: ${error.error || error.message}`;
+                        }
+                        
+                        resultDiv.innerHTML = `
+                            <div style="padding: 15px; background: rgba(231, 76, 60, 0.2); border-radius: 10px; border-left: 4px solid #e74c3c;">
+                                <h3>❌ Ainda com problemas</h3>
+                                <p>${errorMsg}</p>
+                                <p>Tente configurar os cookies novamente ou use o modo offline.</p>
+                            </div>
+                        `;
+                    }
+                });
+            };
+            script.onerror = () => {
+                resultDiv.innerHTML = `
+                    <div style="padding: 15px; background: rgba(231, 76, 60, 0.2); border-radius: 10px; border-left: 4px solid #e74c3c;">
+                        <h3>❌ Erro de Conectividade</h3>
+                        <p>Não foi possível carregar a API do Google. Verifique sua conexão.</p>
+                    </div>
+                `;
+            };
+            document.head.appendChild(script);
+        }
+
+        function checkCookies() {
+            const resultDiv = document.getElementById('testResult');
+            
+            const cookiesEnabled = navigator.cookieEnabled;
+            const canSetCookie = (function() {
+                try {
+                    document.cookie = "test=1; SameSite=None; Secure";
+                    const result = document.cookie.indexOf("test=1") !== -1;
+                    document.cookie = "test=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                    return result;
+                } catch (e) {
+                    return false;
+                }
+            })();
+            
+            const hasLocalStorage = (function() {
+                try {
+                    localStorage.setItem('test', 'test');
+                    localStorage.removeItem('test');
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            })();
+            
+            resultDiv.innerHTML = `
+                <div style="padding: 15px; background: rgba(52, 152, 219, 0.2); border-radius: 10px; border-left: 4px solid #3498db;">
+                    <h3>🍪 Status dos Cookies</h3>
+                    <p><strong>Cookies habilitados:</strong> ${cookiesEnabled ? '✅ Sim' : '❌ Não'}</p>
+                    <p><strong>Cookies de terceiros:</strong> ${canSetCookie ? '✅ Funcionando' : '❌ Bloqueados'}</p>
+                    <p><strong>Local Storage:</strong> ${hasLocalStorage ? '✅ Disponível' : '❌ Bloqueado'}</p>
+                    <p><strong>Protocolo:</strong> ${location.protocol === 'https:' ? '✅ HTTPS' : '❌ HTTP'}</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
