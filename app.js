@@ -1,3 +1,4 @@
+// Dados do jogador
 const data = {
     quests: {},
     subquests: {},
@@ -7,6 +8,7 @@ const data = {
     lastCompletedDate: null,
     theme: 'default',
     notifiedQuests: {},
+    lastSync: null,
     notificationInterval: null
 };
 
@@ -18,167 +20,85 @@ const questSchedule = [
     { id: 'arena4', name: 'Arena 23:00', hour: 23, minute: 0 }
 ];
 
-function playNotificationSound() {
-    try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const duration = 0.3;
-        
-        // Primeira nota
-        const oscillator1 = audioContext.createOscillator();
-        const gainNode1 = audioContext.createGain();
-        oscillator1.connect(gainNode1);
-        gainNode1.connect(audioContext.destination);
-        oscillator1.frequency.value = 800;
-        gainNode1.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode1.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-        oscillator1.start(audioContext.currentTime);
-        oscillator1.stop(audioContext.currentTime + duration);
-        
-        // Segunda nota (mais aguda)
-        setTimeout(() => {
-            const oscillator2 = audioContext.createOscillator();
-            const gainNode2 = audioContext.createGain();
-            oscillator2.connect(gainNode2);
-            gainNode2.connect(audioContext.destination);
-            oscillator2.frequency.value = 1000;
-            gainNode2.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-            oscillator2.start(audioContext.currentTime);
-            oscillator2.stop(audioContext.currentTime + duration);
-        }, 150);
-    } catch (error) {
-        console.log('Erro ao reproduzir som:', error);
-    }
-}
+// Lista de quests principais
+const questsData = [
+    { id: 'checkin', name: 'Check-in Diário', emoji: '✅', xp: 50, category: 'daily' },
+    { id: 'spoils', name: 'Espólios', emoji: '💰', xp: 100, category: 'daily', 
+      subquests: [
+          { id: 'spoils_1', name: 'Espólio 1', xp: 20 },
+          { id: 'spoils_2', name: 'Espólio 2', xp: 20 },
+          { id: 'spoils_3', name: 'Espólio 3', xp: 20 },
+          { id: 'spoils_4', name: 'Espólio 4', xp: 20 },
+          { id: 'spoils_5', name: 'Espólio 5', xp: 20 }
+      ]
+    },
+    { id: 'expedition', name: 'Expedição', emoji: '🗺️', xp: 150, category: 'daily' },
+    { id: 'infernal', name: 'Infernal', emoji: '🔥', xp: 200, category: 'weekly' },
+    { id: 'mirage', name: 'Miragem', emoji: '🌫️', xp: 180, category: 'special' },
+    { id: 'ares', name: 'Ares', emoji: '⚔️', xp: 250, category: 'weekly' },
+    { id: 'events', name: 'Eventos', emoji: '🎉', xp: 120, category: 'special' },
+    { id: 'ketra', name: 'Ketra', emoji: '🏰', xp: 300, category: 'weekly' },
+    { id: 'colosseum', name: 'Coliseu', emoji: '🏛️', xp: 220, category: 'pvp' },
+    { id: 'castle', name: 'Castelo', emoji: '👑', xp: 400, category: 'guild' },
+    { id: 'guildwar', name: 'Guerra de Guild', emoji: '⚡', xp: 350, category: 'guild' }
+];
 
-function startNotificationLoop() {
-    if (data.notificationInterval) {
-        clearInterval(data.notificationInterval);
-    }
-    data.notificationInterval = setInterval(() => {
-        playNotificationSound();
-    }, 3000); // Repete a cada 3 segundos
-}
-
-function stopNotificationLoop() {
-    if (data.notificationInterval) {
-        clearInterval(data.notificationInterval);
-        data.notificationInterval = null;
-    }
-}
-
-function checkQuestNotifications() {
-    const now = new Date();
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
-    const today = now.toDateString();
+// Inicializar aplicação
+function initializeApp() {
+    loadData();
+    updateUI();
+    updateTimeToReset();
     
-    // Reseta notificações no início do dia
-    if (!data.notifiedQuests[today]) {
-        data.notifiedQuests = { [today]: {} };
-        saveData();
+    // Verificar se precisa resetar as quests
+    const lastResetDate = data.lastResetDate || '';
+    const today = new Date().toDateString();
+    
+    if (lastResetDate !== today) {
+        resetDailyQuests();
     }
     
-    questSchedule.forEach(quest => {
-        // Calcula o horário de notificação (5 minutos antes)
-        let notifyHour = quest.hour;
-        let notifyMinute = quest.minute - 5;
-        
-        if (notifyMinute < 0) {
-            notifyMinute += 60;
-            notifyHour -= 1;
+    // Atualizar timer a cada minuto
+    setInterval(updateTimeToReset, 60000);
+    
+    // Configurar tema
+    applyTheme();
+    
+    // Inicializar notificações
+    initializeNotifications();
+}
+
+// Carregar dados salvos
+function loadData() {
+    const saved = localStorage.getItem('wydQuestData');
+    if (saved) {
+        const savedData = JSON.parse(saved);
+        Object.assign(data, savedData);
+    }
+    
+    // Inicializar quests se não existirem
+    questsData.forEach(quest => {
+        if (!data.quests[quest.id]) {
+            data.quests[quest.id] = false;
         }
         
-        // Verifica se é hora de notificar
-        if (currentHour === notifyHour && currentMinute === notifyMinute) {
-            const notificationKey = `${quest.id}_${today}`;
-            
-            if (!data.notifiedQuests[today][notificationKey] && !data.quests[quest.id]) {
-                startNotificationLoop(); // Inicia loop de som
-                showPersistentNotification(`⏰ ${quest.name} começa em 5 minutos!`, quest.id);
-                
-                // Notificação do navegador se disponível
-                if ('Notification' in window && Notification.permission === 'granted') {
-                    new Notification('WYD Quest Tracker', {
-                        body: `⏰ ${quest.name} começa em 5 minutos!`,
-                        icon: '/icon-192x192.png',
-                        tag: quest.id
-                    });
+        if (quest.subquests) {
+            quest.subquests.forEach(subquest => {
+                if (!data.subquests[subquest.id]) {
+                    data.subquests[subquest.id] = false;
                 }
-            }
+            });
         }
     });
 }
 
-function requestNotificationPermission() {
-    if ('Notification' in window) {
-        if (Notification.permission === 'default') {
-            Notification.requestPermission().then(permission => {
-                if (permission === 'granted') {
-                    console.log('✅ Permissão de notificação concedida');
-                    showAchievement('🔔 Notificações ativadas! Você será alertado antes das arenas.');
-                    
-                    // Teste de notificação
-                    setTimeout(() => {
-                        new Notification('⚔️ WYD Quest Tracker', {
-                            body: 'Notificações configuradas com sucesso! 🎉',
-                            icon: './icon-192x192.png',
-                            tag: 'test'
-                        });
-                    }, 1000);
-                } else {
-                    console.log('❌ Permissão de notificação negada');
-                }
-            });
-        } else if (Notification.permission === 'granted') {
-            console.log('✅ Permissões já concedidas');
-        } else {
-            console.log('❌ Notificações bloqueadas pelo usuário');
-        }
-    } else {
-        console.log('❌ Navegador não suporta notificações');
-    }
-}
-
-function loadData() {
-    const saved = localStorage.getItem('wydQuestData');
-    if (saved) {
-        Object.assign(data, JSON.parse(saved));
-        applyTheme();
-        checkDailyReset();
-        updateUI();
-    }
-    
-    // Solicita permissão para notificações
-    requestNotificationPermission();
-}
-
-function applyTheme() {
-    document.body.className = '';
-    if (data.theme === 'dark') {
-        document.body.classList.add('dark-theme');
-    }
-}
-
-function toggleTheme() {
-    if (data.theme === 'dark') {
-        data.theme = 'default';
-    } else {
-        data.theme = 'dark';
-    }
-    applyTheme();
-    saveData();
-}
-
+// Salvar dados
 function saveData() {
-    // Adicionar timestamp da última modificação
     data.lastSync = new Date().toISOString();
     localStorage.setItem('wydQuestData', JSON.stringify(data));
-    
-    // Dados salvos localmente - ultimate-sync cuida da sincronização
-    console.log('� Dados salvos localmente');
+    console.log('💾 Dados salvos localmente');
 }
 
+// Verificar reset diário
 function checkDailyReset() {
     const now = new Date();
     const today = now.toDateString();
@@ -187,254 +107,381 @@ function checkDailyReset() {
         const yesterday = new Date(now);
         yesterday.setDate(yesterday.getDate() - 1);
         
-        if (data.lastCompletedDate === yesterday.toDateString() && Object.values(data.quests).some(q => q)) {
+        if (data.lastCompletedDate === yesterday.toDateString()) {
             data.streak++;
-        } else if (data.lastCompletedDate && data.lastCompletedDate !== yesterday.toDateString()) {
+        } else if (data.lastCompletedDate !== null) {
             data.streak = 0;
         }
+    }
+}
+
+// Resetar quests diárias
+function resetDailyQuests() {
+    const today = new Date().toDateString();
+    
+    questsData.forEach(quest => {
+        if (quest.category === 'daily') {
+            data.quests[quest.id] = false;
+            
+            if (quest.subquests) {
+                quest.subquests.forEach(subquest => {
+                    data.subquests[subquest.id] = false;
+                });
+            }
+        }
+    });
+    
+    data.lastResetDate = today;
+    data.notifiedQuests = {};
+    saveData();
+    updateUI();
+    showAchievement('🌅 Quests diárias resetadas!');
+}
+
+// Alternar conclusão de quest
+function toggleQuest(questId) {
+    const quest = questsData.find(q => q.id === questId);
+    if (!quest) return;
+    
+    data.quests[questId] = !data.quests[questId];
+    
+    if (data.quests[questId]) {
+        // Quest completada
+        data.totalXP += quest.xp;
         
-        data.quests = {};
-        data.subquests = {};
-        data.lastCompletedDate = null;
-        saveData();
-    }
-}
-
-function updateUI() {
-    let completed = 0;
-    const total = document.querySelectorAll('.quest-item').length;
-    
-    // Conta quests normais completadas
-    document.querySelectorAll('.quest-item:not(.multi-quest)').forEach(item => {
-        if (data.quests[item.dataset.quest]) {
-            completed++;
-        }
-    });
-    
-    // Conta multi-quests (expedição e infernal)
-    const expedicaoCompleted = ['expedicao-1', 'expedicao-2', 'expedicao-3'].every(id => data.subquests[id]);
-    const infernalCompleted = ['infernal-1', 'infernal-2'].every(id => data.subquests[id]);
-    
-    if (expedicaoCompleted) completed++;
-    if (infernalCompleted) completed++;
-    
-    document.getElementById('completed').textContent = completed;
-    document.getElementById('total').textContent = total;
-    document.getElementById('streak').textContent = data.streak;
-    document.getElementById('level').textContent = data.level;
-    document.getElementById('totalXP').textContent = data.totalXP;
-    
-    const progress = (data.totalXP % 100);
-    document.getElementById('levelProgress').style.width = progress + '%';
-    
-    // Atualiza quests normais
-    document.querySelectorAll('.quest-item:not(.multi-quest)').forEach(item => {
-        const questId = item.dataset.quest;
-        if (data.quests[questId]) {
-            item.classList.add('completed');
-        } else {
-            item.classList.remove('completed');
-        }
-    });
-    
-    // Atualiza subquests
-    document.querySelectorAll('.quest-subcheck').forEach(subcheck => {
-        const subquestId = subcheck.dataset.subquest;
-        if (data.subquests[subquestId]) {
-            subcheck.classList.add('completed');
-        } else {
-            subcheck.classList.remove('completed');
-        }
-    });
-    
-    // Atualiza visual das multi-quests
-    if (expedicaoCompleted) {
-        document.querySelector('[data-quest="expedicao"]').classList.add('completed');
-    } else {
-        document.querySelector('[data-quest="expedicao"]').classList.remove('completed');
-    }
-    
-    if (infernalCompleted) {
-        document.querySelector('[data-quest="infernal"]').classList.add('completed');
-    } else {
-        document.querySelector('[data-quest="infernal"]').classList.remove('completed');
-    }
-}
-
-function showAchievement(text) {
-    const popup = document.getElementById('achievementPopup');
-    document.getElementById('achievementText').textContent = text;
-    popup.classList.add('show');
-    
-    setTimeout(() => {
-        popup.classList.remove('show');
-    }, 3000);
-}
-
-function showPersistentNotification(text, questId) {
-    const popup = document.getElementById('achievementPopup');
-    const closeBtn = document.getElementById('notificationClose');
-    
-    document.getElementById('achievementText').textContent = text;
-    popup.classList.add('show', 'persistent');
-    closeBtn.style.display = 'block';
-    
-    closeBtn.onclick = () => {
-        stopNotificationLoop(); // Para o loop de som
-        popup.classList.remove('show', 'persistent');
-        closeBtn.style.display = 'none';
+        // Calcular nível baseado no XP
+        data.level = Math.floor(data.totalXP / 1000) + 1;
         
-        // Marca como notificado para não repetir
+        checkDailyReset();
         const today = new Date().toDateString();
-        if (!data.notifiedQuests[today]) {
-            data.notifiedQuests[today] = {};
-        }
-        const notificationKey = `${questId}_${today}`;
-        data.notifiedQuests[today][notificationKey] = true;
-        saveData();
-    };
+        data.lastCompletedDate = today;
+        
+        showAchievement(`✅ ${quest.name} completada! +${quest.xp} XP`);
+        
+        // Efeito sonoro
+        playCompletionSound();
+        
+        // Efeito visual
+        addCelebrationEffect(questId);
+    } else {
+        // Quest desmarcada
+        data.totalXP = Math.max(0, data.totalXP - quest.xp);
+        data.level = Math.floor(data.totalXP / 1000) + 1;
+        showAchievement(`↩️ ${quest.name} desmarcada! -${quest.xp} XP`);
+    }
+    
+    updateUI();
+    saveData();
 }
 
-function addXP(amount) {
-    data.totalXP += amount;
-    const newLevel = Math.floor(data.totalXP / 100) + 1;
+// Alternar subquest
+function toggleSubquest(subquestId) {
+    const parentQuest = questsData.find(quest => 
+        quest.subquests && quest.subquests.some(sub => sub.id === subquestId)
+    );
     
-    if (newLevel > data.level) {
-        data.level = newLevel;
-        showAchievement(`Level Up! Você alcançou o nível ${data.level}!`);
+    if (!parentQuest) return;
+    
+    const subquest = parentQuest.subquests.find(sub => sub.id === subquestId);
+    data.subquests[subquestId] = !data.subquests[subquestId];
+    
+    if (data.subquests[subquestId]) {
+        data.totalXP += subquest.xp;
+        data.level = Math.floor(data.totalXP / 1000) + 1;
+        showAchievement(`✅ ${subquest.name} completada! +${subquest.xp} XP`);
+        playCompletionSound();
+    } else {
+        data.totalXP = Math.max(0, data.totalXP - subquest.xp);
+        data.level = Math.floor(data.totalXP / 1000) + 1;
+        showAchievement(`↩️ ${subquest.name} desmarcada! -${subquest.xp} XP`);
+    }
+    
+    // Verificar se todas as subquests estão completas
+    const allSubquestsComplete = parentQuest.subquests.every(sub => data.subquests[sub.id]);
+    if (allSubquestsComplete && !data.quests[parentQuest.id]) {
+        toggleQuest(parentQuest.id);
+        return; // toggleQuest já chama updateUI e saveData
+    }
+    
+    updateUI();
+    saveData();
+}
+
+// Atualizar interface
+function updateUI() {
+    updateStats();
+    updateQuestList();
+}
+
+// Atualizar estatísticas
+function updateStats() {
+    document.getElementById('level').textContent = data.level;
+    document.getElementById('xp').textContent = data.totalXP;
+    document.getElementById('streak').textContent = data.streak;
+    
+    // Calcular XP até próximo nível
+    const currentLevelXP = (data.level - 1) * 1000;
+    const nextLevelXP = data.level * 1000;
+    const progressXP = data.totalXP - currentLevelXP;
+    const neededXP = nextLevelXP - data.totalXP;
+    
+    document.getElementById('nextLevel').textContent = neededXP;
+    
+    // Barra de progresso
+    const progressPercent = (progressXP / 1000) * 100;
+    document.getElementById('progressBar').style.width = progressPercent + '%';
+}
+
+// Atualizar lista de quests
+function updateQuestList() {
+    const questList = document.getElementById('questList');
+    questList.innerHTML = '';
+    
+    questsData.forEach(quest => {
+        const questElement = createQuestElement(quest);
+        questList.appendChild(questElement);
+    });
+}
+
+// Criar elemento de quest
+function createQuestElement(quest) {
+    const questDiv = document.createElement('div');
+    questDiv.className = 'quest-item';
+    questDiv.id = `quest-${quest.id}`;
+    
+    const isCompleted = data.quests[quest.id];
+    if (isCompleted) {
+        questDiv.classList.add('completed');
+    }
+    
+    let subquestHTML = '';
+    if (quest.subquests) {
+        const completedSubs = quest.subquests.filter(sub => data.subquests[sub.id]).length;
+        const totalSubs = quest.subquests.length;
+        
+        subquestHTML = `
+            <div class="subquest-progress">
+                <span class="subquest-counter">${completedSubs}/${totalSubs}</span>
+                <div class="subquest-bar">
+                    <div class="subquest-fill" style="width: ${(completedSubs/totalSubs)*100}%"></div>
+                </div>
+            </div>
+            <div class="subquest-list">
+                ${quest.subquests.map(subquest => `
+                    <div class="subquest-item ${data.subquests[subquest.id] ? 'completed' : ''}" 
+                         onclick="toggleSubquest('${subquest.id}')">
+                        <span class="checkbox">${data.subquests[subquest.id] ? '✅' : '⬜'}</span>
+                        <span>${subquest.name}</span>
+                        <span class="xp">+${subquest.xp} XP</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    questDiv.innerHTML = `
+        <div class="quest-header" onclick="toggleQuest('${quest.id}')">
+            <div class="quest-info">
+                <span class="quest-emoji">${quest.emoji}</span>
+                <span class="quest-name">${quest.name}</span>
+                <span class="quest-category ${quest.category}">${getCategoryName(quest.category)}</span>
+            </div>
+            <div class="quest-reward">
+                <span class="xp">+${quest.xp} XP</span>
+                <span class="checkbox">${isCompleted ? '✅' : '⬜'}</span>
+            </div>
+        </div>
+        ${subquestHTML}
+    `;
+    
+    return questDiv;
+}
+
+// Obter nome da categoria
+function getCategoryName(category) {
+    const names = {
+        'daily': 'Diária',
+        'weekly': 'Semanal',
+        'special': 'Especial',
+        'pvp': 'PvP',
+        'guild': 'Guild'
+    };
+    return names[category] || category;
+}
+
+// Alternar tema
+function toggleTheme() {
+    data.theme = data.theme === 'default' ? 'dark' : 'default';
+    applyTheme();
+    saveData();
+}
+
+// Aplicar tema
+function applyTheme() {
+    if (data.theme === 'dark') {
+        document.body.classList.add('dark-theme');
+    } else {
+        document.body.classList.remove('dark-theme');
     }
 }
 
-function updateTimer() {
+// Atualizar tempo para reset
+function updateTimeToReset() {
     const now = new Date();
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
     
-    const diff = tomorrow - now;
-    const hours = Math.floor(diff / 3600000);
-    const minutes = Math.floor((diff % 3600000) / 60000);
-    const seconds = Math.floor((diff % 60000) / 1000);
+    const timeLeft = tomorrow - now;
+    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
     
-    document.getElementById('resetTimer').textContent = 
-        `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    document.getElementById('timeToReset').textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 }
 
-// Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-    // Quest items (não multi-quest)
-    document.querySelectorAll('.quest-item:not(.multi-quest)').forEach(item => {
-        item.addEventListener('click', function() {
-            const questId = this.dataset.quest;
-            const wasCompleted = data.quests[questId];
-            
-            data.quests[questId] = !wasCompleted;
-            
-            if (!wasCompleted) {
-                const now = new Date();
-                data.lastCompletedDate = now.toDateString();
-                addXP(10);
-                
-                checkAllQuestsCompleted();
-            } else {
-                data.totalXP = Math.max(0, data.totalXP - 10);
-                data.level = Math.floor(data.totalXP / 100) + 1;
-            }
-            
-            saveData();
-            updateUI();
-        });
-    });
-
-    // Handler para sub-checkboxes
-    document.querySelectorAll('.quest-subcheck').forEach(subcheck => {
-        subcheck.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const subquestId = this.dataset.subquest;
-            const wasCompleted = data.subquests[subquestId];
-            
-            data.subquests[subquestId] = !wasCompleted;
-            
-            if (!wasCompleted) {
-                const now = new Date();
-                data.lastCompletedDate = now.toDateString();
-                addXP(10);
-                
-                checkAllQuestsCompleted();
-            } else {
-                data.totalXP = Math.max(0, data.totalXP - 10);
-                data.level = Math.floor(data.totalXP / 100) + 1;
-            }
-            
-            saveData();
-            updateUI();
-        });
-    });
-});
-
-function checkAllQuestsCompleted() {
-    let completed = 0;
-    const total = document.querySelectorAll('.quest-item').length;
+// Sistema de notificações
+function initializeNotifications() {
+    // Solicitar permissão para notificações
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
     
-    // Conta quests normais
-    document.querySelectorAll('.quest-item:not(.multi-quest)').forEach(item => {
-        if (data.quests[item.dataset.quest]) {
-            completed++;
+    // Configurar verificação de horários
+    setInterval(checkQuestSchedule, 60000); // Verificar a cada minuto
+}
+
+// Verificar horários das quests
+function checkQuestSchedule() {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    
+    questSchedule.forEach(quest => {
+        const questKey = `${quest.id}_${now.toDateString()}`;
+        
+        if (currentHour === quest.hour && currentMinute === quest.minute) {
+            if (!data.notifiedQuests[questKey]) {
+                showQuestNotification(quest);
+                data.notifiedQuests[questKey] = true;
+                saveData();
+            }
         }
     });
+}
+
+// Mostrar notificação de quest
+function showQuestNotification(quest) {
+    const message = `🎮 ${quest.name} está disponível agora!`;
     
-    // Conta multi-quests
-    const expedicaoCompleted = ['expedicao-1', 'expedicao-2', 'expedicao-3'].every(id => data.subquests[id]);
-    const infernalCompleted = ['infernal-1', 'infernal-2'].every(id => data.subquests[id]);
+    // Notificação do navegador
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('WYD Quest Tracker', {
+            body: message,
+            icon: 'icon-192x192.png',
+            badge: 'icon-192x192.png'
+        });
+    }
     
-    if (expedicaoCompleted) completed++;
-    if (infernalCompleted) completed++;
+    // Notificação visual no app
+    showAchievement(message);
     
-    if (completed === total) {
-        addXP(50);
-        showAchievement('Todas as quests completadas! +50 XP Bônus!');
-        document.querySelector('.stats-container').classList.add('celebrating');
+    // Som de notificação
+    playNotificationSound();
+}
+
+// Reproduzir som de conclusão
+function playCompletionSound() {
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+    } catch (e) {
+        console.log('Áudio não disponível:', e);
+    }
+}
+
+// Reproduzir som de notificação
+function playNotificationSound() {
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(660, audioContext.currentTime + 0.2);
+        oscillator.frequency.setValueAtTime(880, audioContext.currentTime + 0.4);
+        
+        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.6);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.6);
+    } catch (e) {
+        console.log('Áudio não disponível:', e);
+    }
+}
+
+// Mostrar conquista/achievement
+function showAchievement(message) {
+    // Remover achievement anterior se existir
+    const existing = document.querySelector('.achievement');
+    if (existing) {
+        existing.remove();
+    }
+    
+    const achievement = document.createElement('div');
+    achievement.className = 'achievement';
+    achievement.textContent = message;
+    
+    document.body.appendChild(achievement);
+    
+    // Mostrar com animação
+    setTimeout(() => achievement.classList.add('show'), 100);
+    
+    // Remover após 3 segundos
+    setTimeout(() => {
+        achievement.classList.remove('show');
+        setTimeout(() => achievement.remove(), 300);
+    }, 3000);
+}
+
+// Adicionar efeito de celebração
+function addCelebrationEffect(questId) {
+    const questElement = document.getElementById(`quest-${questId}`);
+    if (questElement) {
+        questElement.classList.add('celebration');
         setTimeout(() => {
-            document.querySelector('.stats-container').classList.remove('celebrating');
+            questElement.classList.remove('celebration');
         }, 500);
     }
 }
 
+// Teste de notificação
 function testNotification() {
-    if ('Notification' in window) {
-        if (Notification.permission === 'granted') {
-            new Notification('⚔️ Teste de Notificação', {
-                body: '🎉 Perfeito! As notificações estão funcionando.\nVocê será alertado antes das arenas!',
-                icon: './icon-192x192.png',
-                tag: 'test',
-                vibrate: [200, 100, 200]
-            });
-            showAchievement('✅ Teste realizado! Notificação enviada.');
-        } else if (Notification.permission === 'default') {
-            requestNotificationPermission();
-        } else {
-            showAchievement('❌ Notificações bloqueadas. Ative nas configurações do navegador.');
-        }
-    } else {
-        showAchievement('❌ Seu navegador não suporta notificações.');
-    }
-}
-
-// Inicialização
-loadData();
-updateTimer();
-setInterval(updateTimer, 1000);
-setInterval(checkDailyReset, 60000);
-setInterval(checkQuestNotifications, 60000); // Verifica notificações a cada minuto
-checkQuestNotifications(); // Verifica imediatamente ao carregar
-
-// Registra background sync se disponível
-if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
-    navigator.serviceWorker.ready.then(registration => {
-        return registration.sync.register('quest-notification');
-    }).catch(err => {
-        console.log('Background sync não disponível:', err);
+    showQuestNotification({
+        id: 'test',
+        name: 'Teste de Notificação',
+        hour: new Date().getHours(),
+        minute: new Date().getMinutes()
     });
 }
 
-// Inicialização removida - agora é feita pelo ultimate-sync.js
+// Inicialização do aplicativo
+document.addEventListener('DOMContentLoaded', function() {
+    initializeApp();
+});
