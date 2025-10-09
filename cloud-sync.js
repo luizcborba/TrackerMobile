@@ -10,6 +10,17 @@ class CloudSync {
     }
 
     async initGoogleAuth() {
+        // Verificar se está em ambiente compatível
+        const isLocalhost = window.location.hostname === 'localhost' || 
+                           window.location.hostname === '127.0.0.1';
+        const isHTTPS = window.location.protocol === 'https:';
+        
+        if (!isLocalhost && !isHTTPS) {
+            console.log('Google Auth só funciona em HTTPS ou localhost');
+            this.initDemoMode();
+            return;
+        }
+
         try {
             // Carregar Google API
             await this.loadGoogleAPI();
@@ -38,6 +49,7 @@ class CloudSync {
 
     initDemoMode() {
         // Simula interface de login para demonstração
+        this.demoMode = true;
         setTimeout(() => {
             this.updateUI();
         }, 1000);
@@ -227,7 +239,16 @@ class CloudSync {
             `;
             userInfo.style.display = 'block';
         } else {
-            loginBtn.textContent = '🔐 Login Google';
+            const isLocalhost = window.location.hostname === 'localhost' || 
+                               window.location.hostname === '127.0.0.1';
+            const isHTTPS = window.location.protocol === 'https:';
+            
+            if (this.demoMode || (!isLocalhost && !isHTTPS)) {
+                loginBtn.textContent = '🔐 Login Demo (Local)';
+            } else {
+                loginBtn.textContent = '🔐 Login Google';
+            }
+            
             loginBtn.onclick = () => this.signIn();
             userInfo.style.display = 'none';
         }
