@@ -261,3 +261,16 @@ class SupabaseSync {
 
 // Instância global
 const supabaseSync = new SupabaseSync();
+
+// Expor no window para acesso global
+window.supabaseSync = supabaseSync;
+
+// Auto-inicializar quando o DOM estiver pronto
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        supabaseSync.init();
+    });
+} else {
+    // DOM já está pronto
+    supabaseSync.init();
+}
