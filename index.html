@@ -457,33 +457,7 @@
             animation: celebration 0.5s ease;
         }
 
-        /* Login Styles */
-        .login-section {
-            text-align: center;
-        }
 
-        .login-btn {
-            background: linear-gradient(135deg, #4285f4, #34a853);
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 0.9em;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            touch-action: manipulation;
-            box-shadow: 0 2px 10px rgba(66, 133, 244, 0.3);
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.4);
-        }
-
-        .login-btn:active {
-            transform: translateY(0);
-        }
 
         .user-info {
             display: flex;
@@ -574,12 +548,6 @@
             <div class="theme-toggle" onclick="toggleTheme()">🌓</div>
             <h1>⚔️ WYD Quest Tracker ⚔️</h1>
             <p>Acompanhe suas missões diárias</p>
-            
-            <!-- Login Section -->
-            <div class="login-section" style="margin-top: 15px;">
-                <button id="loginBtn" class="login-btn">🔐 Login Google</button>
-                <div id="userInfo" class="user-info" style="display: none; margin-top: 8px; font-size: 0.85em; color: #6b4423;"></div>
-            </div>
         </div>
 
         <div class="stats-container">
@@ -613,7 +581,7 @@
                 <div class="quest-checkbox"></div>
                 <div class="quest-info">
                     <div class="quest-name">Check-in</div>
-                    <div class="quest-description">Faça login no jogo</div>
+                    <div class="quest-description">Check-in diário</div>
                 </div>
             </div>
 
@@ -730,7 +698,6 @@
     </div>
 
     <script src="app.js"></script>
-    <script src="supabase-sync.js"></script>
     <script>
         // Register Service Worker
         if ('serviceWorker' in navigator) {
@@ -748,63 +715,7 @@
         // Initialize Cloud Sync
         window.addEventListener('load', () => {
     <script src="app.js"></script>
-    <script src="supabase-sync.js"></script>
     <script>
-        // Process auth tokens from URL hash on page load
-        function processAuthFromURL() {
-            const hashParams = new URLSearchParams(window.location.hash.substring(1));
-            const accessToken = hashParams.get('access_token');
-            const refreshToken = hashParams.get('refresh_token');
-            
-            if (accessToken && refreshToken) {
-                console.log('🔐 Tokens encontrados na URL, processando...');
-                
-                // Try multiple times until supabaseSync is ready
-                let attempts = 0;
-                const maxAttempts = 10;
-                
-                const trySetSession = () => {
-                    attempts++;
-                    
-                    if (window.supabaseSync && window.supabaseSync.supabase && window.supabaseSync.isInitialized) {
-                        console.log('✅ SupabaseSync pronto, definindo sessão...');
-                        
-                        window.supabaseSync.supabase.auth.setSession({
-                            access_token: accessToken,
-                            refresh_token: refreshToken
-                        }).then(({ data, error }) => {
-                            if (error) {
-                                console.error('❌ Erro ao definir sessão:', error);
-                                showAchievement(`❌ Erro no login: ${error.message}`);
-                            } else {
-                                console.log('✅ Sessão definida com sucesso!', data.user?.email);
-                                window.supabaseSync.user = data.user;
-                                window.supabaseSync.updateUI();
-                                
-                                // Clear URL hash
-                                history.replaceState(null, null, window.location.pathname);
-                                
-                                const userName = data.user?.user_metadata?.full_name || data.user?.user_metadata?.name || data.user?.email || 'Usuário';
-                                showAchievement(`🎉 Bem-vindo, ${userName}!`);
-                            }
-                        }).catch(err => {
-                            console.error('❌ Erro ao processar tokens:', err);
-                            showAchievement(`❌ Erro ao processar login: ${err.message}`);
-                        });
-                        
-                    } else if (attempts < maxAttempts) {
-                        console.log(`⏳ Tentativa ${attempts}/${maxAttempts} - Aguardando Supabase...`);
-                        setTimeout(trySetSession, 500);
-                    } else {
-                        console.error('❌ Timeout: SupabaseSync não inicializou');
-                        showAchievement('❌ Erro: Sistema não inicializou corretamente');
-                    }
-                };
-                
-                trySetSession();
-            }
-        }
-
         // Register Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -817,16 +728,6 @@
                     });
             });
         }
-
-        // Initialize everything when page loads
-        window.addEventListener('load', () => {
-            // Wait a bit for supabaseSync to initialize, then process auth
-            setTimeout(() => {
-                if (window.supabaseSync) {
-                    processAuthFromURL();
-                }
-            }, 1000);
-        });
 
         // PWA Install Prompt
         let deferredPrompt;

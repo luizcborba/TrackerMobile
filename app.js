@@ -96,11 +96,6 @@ function saveData() {
     data.lastSync = new Date().toISOString();
     localStorage.setItem('wydQuestData', JSON.stringify(data));
     console.log('💾 Dados salvos localmente');
-    
-    // Sincronizar com nuvem se usuário estiver logado
-    if (window.supabaseSync) {
-        supabaseSync.autoSync();
-    }
 }
 
 // Verificar reset diário
@@ -489,11 +484,4 @@ function testNotification() {
 // Inicialização do aplicativo
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
-    
-    // Inicializar Supabase após um delay para garantir que tudo carregou
-    setTimeout(() => {
-        if (window.supabaseSync) {
-            supabaseSync.init();
-        }
-    }, 1000);
 });
