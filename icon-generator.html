@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gerador de Ícones PWA</title>
+</head>
+<body>
+    <canvas id="canvas" width="512" height="512" style="border: 1px solid #ccc;"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function createIcon(size) {
+            canvas.width = size;
+            canvas.height = size;
+            
+            // Fundo gradiente
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#2a2a2a');
+            gradient.addColorStop(0.5, '#1f1f1f');
+            gradient.addColorStop(1, '#151515');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Borda
+            ctx.strokeStyle = '#e67e22';
+            ctx.lineWidth = size * 0.02;
+            ctx.strokeRect(size * 0.05, size * 0.05, size * 0.9, size * 0.9);
+            
+            // Espada
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const swordHeight = size * 0.4;
+            const swordWidth = size * 0.03;
+            
+            ctx.fillStyle = '#e67e22';
+            ctx.fillRect(centerX - swordWidth/2, centerY - swordHeight/2, swordWidth, swordHeight * 0.8);
+            
+            // Guarda da espada
+            ctx.fillRect(centerX - size * 0.1, centerY - size * 0.02, size * 0.2, size * 0.04);
+            
+            // Cabo
+            ctx.fillStyle = '#d4b896';
+            ctx.fillRect(centerX - swordWidth/2 * 1.5, centerY + size * 0.1, swordWidth * 1.5, size * 0.15);
+            
+            // Texto WYD
+            ctx.fillStyle = '#e67e22';
+            ctx.font = `bold ${size * 0.1}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText('WYD', centerX, centerY + size * 0.35);
+            
+            return canvas.toDataURL('image/png');
+        }
+        
+        // Gerar ícones de diferentes tamanhos
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        sizes.forEach(size => {
+            const dataUrl = createIcon(size);
+            console.log(`Icon ${size}x${size}:`, dataUrl);
+        });
+    </script>
+</body>
+</html>

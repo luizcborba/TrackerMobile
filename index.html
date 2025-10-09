@@ -4,22 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WYD Quest Tracker</title>
-    
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#e67e22">
-    <meta name="description" content="Acompanhe suas missões diárias do WYD">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="WYD Quest Tracker">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png">
-    <link rel="apple-touch-icon" href="icon-192x192.png">
-    
     <style>
         * {
             margin: 0;
@@ -89,12 +73,11 @@
         }
 
         .stat-label {
-            color: #e67e22;
+            color: #bbb;
             font-size: 0.75em;
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: #bbb;
         }
 
         .stat-value {
@@ -204,9 +187,6 @@
             margin-right: 8px;
         }
 
-            border-color: #e67e22;
-        }
-
         .quest-subcheck:active {
             transform: scale(0.95);
         }
@@ -254,17 +234,11 @@
         .quest-tag {
             display: inline-block;
             padding: 2px 8px;
-            background: rgba(230, 126, 34, 0.2);
-            border: 1px solid #e67e22;
+            background: rgba(231, 76, 60, 0.3);
+            border: 1px solid #e74c3c;
             border-radius: 5px;
             font-size: 0.7em;
             margin-right: 8px;
-            color: #e67e22;
-        }
-
-        .quest-tag.urgent {
-            background: rgba(231, 76, 60, 0.3);
-            border-color: #e74c3c;
             color: #e74c3c;
         }
 
@@ -298,10 +272,6 @@
             transition: transform 0.4s ease;
             z-index: 1000;
             max-width: calc(100% - 20px);
-        }
-
-        .achievement-popup {
-            background: linear-gradient(135deg, #e67e22, #f39c12);
         }
 
         .achievement-popup.show {
@@ -354,96 +324,27 @@
             50% { transform: scale(1.1); }
         }
 
+        @keyframes pulse {
+            0% { 
+                transform: scale(1);
+                box-shadow: 0 8px 30px rgba(230, 126, 34, 0.5);
+            }
+            50% { 
+                transform: scale(1.05);
+                box-shadow: 0 12px 40px rgba(230, 126, 34, 0.8);
+            }
+            100% { 
+                transform: scale(1);
+                box-shadow: 0 8px 30px rgba(230, 126, 34, 0.5);
+            }
+        }
+
         .celebrating {
             animation: celebration 0.5s ease;
         }
-
-
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-
-        .user-info span {
-            color: #bbb;
-        }
-
-        /* Cloud sync indicator */
-        .sync-indicator {
-            display: inline-block;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
-        }
-
-        /* PWA Install Banner */
-        .install-banner {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #e67e22, #f39c12);
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 8px 30px rgba(90, 62, 43, 0.5);
-            transform: translateY(100px);
-            transition: transform 0.4s ease;
-            z-index: 1001;
-            display: none;
-        }
-
-        .install-banner.show {
-            transform: translateY(0);
-            display: block;
-        }
-
-        .install-banner-text {
-            color: #fff;
-            font-size: 0.9em;
-            margin-bottom: 10px;
-        }
-
-        .install-banner-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .install-btn, .dismiss-btn {
-            flex: 1;
-            padding: 8px 16px;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.85em;
-            font-weight: bold;
-            transition: all 0.2s ease;
-            touch-action: manipulation;
-            text-align: center;
-        }
-
-        .install-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-        }
-
-        .dismiss-btn {
-            background: transparent;
-            color: #fff;
-        }
-
-        .install-btn:active, .dismiss-btn:active {
-            transform: scale(0.95);
-        }
     </style>
 </head>
-<body class="dark-theme">
+<body>
     <div class="container">
         <div class="header">
             <h1>⚔️ WYD Quest Tracker ⚔️</h1>
@@ -481,7 +382,7 @@
                 <div class="quest-checkbox"></div>
                 <div class="quest-info">
                     <div class="quest-name">Check-in</div>
-                    <div class="quest-description">Check-in diário</div>
+                    <div class="quest-description">Faça login no jogo</div>
                 </div>
             </div>
 
@@ -583,93 +484,383 @@
     <div class="achievement-popup" id="achievementPopup">
         <div class="achievement-title">🎉 Conquista Desbloqueada!</div>
         <div class="achievement-text" id="achievementText"></div>
-        <button class="notification-close" id="notificationClose" style="display: none;">OK, Entendi!</button>
+        <button class="notification-close" id="notificationClose" style="display: none;">✅ Confirmado! Parar aviso</button>
     </div>
 
-    <!-- PWA Install Banner -->
-    <div class="install-banner" id="installBanner">
-        <div class="install-banner-text">
-            Instale o WYD Quest Tracker em seu dispositivo para acesso rápido!
-        </div>
-        <div class="install-banner-buttons">
-            <div class="install-btn" id="installBtn">Instalar</div>
-            <div class="dismiss-btn" id="dismissBtn">Agora não</div>
-        </div>
-    </div>
-
-    <script src="app.js"></script>
     <script>
-        // Register Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then((registration) => {
-                        console.log('SW registered: ', registration);
-                    })
-                    .catch((registrationError) => {
-                        console.log('SW registration failed: ', registrationError);
-                    });
-            });
+        const data = {
+            quests: {},
+            subquests: {},
+            streak: 0,
+            totalXP: 0,
+            level: 1,
+            lastCompletedDate: null,
+            theme: 'dark',
+            notifiedQuests: {},
+            notificationInterval: null
+        };
+
+        // Sistema de notificação sonora
+        const questSchedule = [
+            { id: 'arena1', name: 'Arena 13:00', hour: 13, minute: 0 },
+            { id: 'arena2', name: 'Arena 19:00', hour: 19, minute: 0 },
+            { id: 'arena3', name: 'Arena 20:30', hour: 20, minute: 30 },
+            { id: 'arena4', name: 'Arena 23:00', hour: 23, minute: 0 }
+        ];
+
+        function playNotificationSound() {
+            try {
+                // Adiciona vibração se suportado
+                if (navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200]);
+                }
+
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const duration = 0.4;
+                
+                // Sequência de 3 notas para chamar mais atenção
+                const frequencies = [800, 1000, 1200];
+                
+                frequencies.forEach((freq, index) => {
+                    setTimeout(() => {
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        oscillator.frequency.value = freq;
+                        gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + duration);
+                    }, index * 200);
+                });
+            } catch (error) {
+                console.log('Erro ao reproduzir som:', error);
+            }
         }
 
-        // Initialize Cloud Sync
-        window.addEventListener('load', () => {
-    <script src="app.js"></script>
-    <script>
-        // Register Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then((registration) => {
-                        console.log('SW registered: ', registration);
-                    })
-                    .catch((registrationError) => {
-                        console.log('SW registration failed: ', registrationError);
-                    });
-            });
+        function startNotificationLoop() {
+            if (data.notificationInterval) {
+                clearInterval(data.notificationInterval);
+            }
+            // Toca imediatamente
+            playNotificationSound();
+            // Depois repete a cada 2 segundos para ser mais insistente
+            data.notificationInterval = setInterval(() => {
+                playNotificationSound();
+            }, 2000);
         }
 
-        // PWA Install Prompt
-        let deferredPrompt;
-        const installBanner = document.getElementById('installBanner');
-        const installBtn = document.getElementById('installBtn');
-        const dismissBtn = document.getElementById('dismissBtn');
+        function stopNotificationLoop() {
+            if (data.notificationInterval) {
+                clearInterval(data.notificationInterval);
+                data.notificationInterval = null;
+            }
+        }
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
+        function checkQuestNotifications() {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+            const currentTime = currentHour * 60 + currentMinute;
+            const today = now.toDateString();
             
-            // Show install banner if not dismissed before
-            if (!localStorage.getItem('installDismissed')) {
+            // Reseta notificações no início do dia
+            if (!data.notifiedQuests[today]) {
+                data.notifiedQuests = { [today]: {} };
+                saveData();
+            }
+            
+            questSchedule.forEach(quest => {
+                const questTime = quest.hour * 60 + quest.minute;
+                const notifyTime = questTime - 5; // 5 minutos antes
+                const endNotifyTime = questTime + 5; // Até 5 minutos depois
+                
+                // Verifica se está no período de notificação (5 min antes até 5 min depois)
+                const shouldNotify = currentTime >= notifyTime && currentTime <= endNotifyTime;
+                const notificationKey = `${quest.id}_${today}`;
+                const isQuestCompleted = data.quests[quest.id];
+                const wasAlreadyNotified = data.notifiedQuests[today][notificationKey];
+                
+                if (shouldNotify && !isQuestCompleted && !wasAlreadyNotified) {
+                    // Determina a mensagem baseada no tempo restante
+                    let message;
+                    if (currentTime < questTime) {
+                        const minutesLeft = questTime - currentTime;
+                        message = `⏰ ${quest.name} começa em ${minutesLeft} minuto${minutesLeft > 1 ? 's' : ''}!`;
+                    } else if (currentTime === questTime) {
+                        message = `🚨 ${quest.name} está começando AGORA!`;
+                    } else {
+                        const minutesPassed = currentTime - questTime;
+                        message = `⚡ ${quest.name} começou há ${minutesPassed} minuto${minutesPassed > 1 ? 's' : ''}!`;
+                    }
+                    
+                    startNotificationLoop(); // Inicia loop de som
+                    showPersistentNotification(message, quest.id);
+                }
+            });
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('wydQuestData');
+            if (saved) {
+                Object.assign(data, JSON.parse(saved));
+                checkDailyReset();
+                updateUI();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('wydQuestData', JSON.stringify(data));
+        }
+
+        function checkDailyReset() {
+            const now = new Date();
+            const today = now.toDateString();
+            
+            if (data.lastCompletedDate !== today) {
+                const yesterday = new Date(now);
+                yesterday.setDate(yesterday.getDate() - 1);
+                
+                if (data.lastCompletedDate === yesterday.toDateString() && Object.values(data.quests).some(q => q)) {
+                    data.streak++;
+                } else if (data.lastCompletedDate && data.lastCompletedDate !== yesterday.toDateString()) {
+                    data.streak = 0;
+                }
+                
+                data.quests = {};
+                data.subquests = {};
+                data.lastCompletedDate = null;
+                saveData();
+            }
+        }
+
+        function updateUI() {
+            let completed = 0;
+            const total = document.querySelectorAll('.quest-item').length;
+            
+            // Conta quests normais completadas
+            document.querySelectorAll('.quest-item:not(.multi-quest)').forEach(item => {
+                if (data.quests[item.dataset.quest]) {
+                    completed++;
+                }
+            });
+            
+            // Conta multi-quests (expedição e infernal)
+            const expedicaoCompleted = ['expedicao-1', 'expedicao-2', 'expedicao-3'].every(id => data.subquests[id]);
+            const infernalCompleted = ['infernal-1', 'infernal-2'].every(id => data.subquests[id]);
+            
+            if (expedicaoCompleted) completed++;
+            if (infernalCompleted) completed++;
+            
+            document.getElementById('completed').textContent = completed;
+            document.getElementById('total').textContent = total;
+            document.getElementById('streak').textContent = data.streak;
+            document.getElementById('level').textContent = data.level;
+            document.getElementById('totalXP').textContent = data.totalXP;
+            
+            const progress = (data.totalXP % 100);
+            document.getElementById('levelProgress').style.width = progress + '%';
+            
+            // Atualiza quests normais
+            document.querySelectorAll('.quest-item:not(.multi-quest)').forEach(item => {
+                const questId = item.dataset.quest;
+                if (data.quests[questId]) {
+                    item.classList.add('completed');
+                } else {
+                    item.classList.remove('completed');
+                }
+            });
+            
+            // Atualiza subquests
+            document.querySelectorAll('.quest-subcheck').forEach(subcheck => {
+                const subquestId = subcheck.dataset.subquest;
+                if (data.subquests[subquestId]) {
+                    subcheck.classList.add('completed');
+                } else {
+                    subcheck.classList.remove('completed');
+                }
+            });
+            
+            // Atualiza visual das multi-quests
+            if (expedicaoCompleted) {
+                document.querySelector('[data-quest="expedicao"]').classList.add('completed');
+            } else {
+                document.querySelector('[data-quest="expedicao"]').classList.remove('completed');
+            }
+            
+            if (infernalCompleted) {
+                document.querySelector('[data-quest="infernal"]').classList.add('completed');
+            } else {
+                document.querySelector('[data-quest="infernal"]').classList.remove('completed');
+            }
+        }
+
+        function showAchievement(text) {
+            const popup = document.getElementById('achievementPopup');
+            document.getElementById('achievementText').textContent = text;
+            popup.classList.add('show');
+            
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 3000);
+        }
+
+        function showPersistentNotification(text, questId) {
+            const popup = document.getElementById('achievementPopup');
+            const closeBtn = document.getElementById('notificationClose');
+            
+            document.getElementById('achievementText').textContent = text;
+            popup.classList.add('show', 'persistent');
+            closeBtn.style.display = 'block';
+            
+            // Adiciona animação pulsante para chamar atenção
+            popup.style.animation = 'pulse 1s infinite';
+            
+            closeBtn.onclick = () => {
+                stopNotificationLoop(); // Para o loop de som
+                popup.classList.remove('show', 'persistent');
+                popup.style.animation = ''; // Remove animação
+                closeBtn.style.display = 'none';
+                
+                // Marca como notificado para não repetir
+                const today = new Date().toDateString();
+                if (!data.notifiedQuests[today]) {
+                    data.notifiedQuests[today] = {};
+                }
+                const notificationKey = `${questId}_${today}`;
+                data.notifiedQuests[today][notificationKey] = true;
+                saveData();
+            };
+        }
+
+        function addXP(amount) {
+            data.totalXP += amount;
+            const newLevel = Math.floor(data.totalXP / 100) + 1;
+            
+            if (newLevel > data.level) {
+                data.level = newLevel;
+                showAchievement(`Level Up! Você alcançou o nível ${data.level}!`);
+            }
+        }
+
+        function updateTimer() {
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0, 0, 0, 0);
+            
+            const diff = tomorrow - now;
+            const hours = Math.floor(diff / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            
+            document.getElementById('resetTimer').textContent = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        // Função para verificar se alguma arena foi completada e parar notificações
+        function checkArenaCompletion() {
+            const arenaQuests = ['arena1', 'arena2', 'arena3', 'arena4'];
+            const anyArenaCompleted = arenaQuests.some(questId => data.quests[questId]);
+            
+            if (anyArenaCompleted && data.notificationInterval) {
+                stopNotificationLoop();
+                // Remove notificação persistente se estiver ativa
+                const popup = document.getElementById('achievementPopup');
+                const closeBtn = document.getElementById('notificationClose');
+                if (popup.classList.contains('persistent')) {
+                    popup.classList.remove('show', 'persistent');
+                    closeBtn.style.display = 'none';
+                }
+            }
+        }
+
+        document.querySelectorAll('.quest-item:not(.multi-quest)').forEach(item => {
+            item.addEventListener('click', function() {
+                const questId = this.dataset.quest;
+                const wasCompleted = data.quests[questId];
+                
+                data.quests[questId] = !wasCompleted;
+                
+                if (!wasCompleted) {
+                    const now = new Date();
+                    data.lastCompletedDate = now.toDateString();
+                    addXP(10);
+                    
+                    checkAllQuestsCompleted();
+                } else {
+                    data.totalXP = Math.max(0, data.totalXP - 10);
+                    data.level = Math.floor(data.totalXP / 100) + 1;
+                }
+                
+                // Verifica se alguma arena foi completada para parar notificações
+                checkArenaCompletion();
+                
+                saveData();
+                updateUI();
+            });
+        });
+
+        // Handler para sub-checkboxes
+        document.querySelectorAll('.quest-subcheck').forEach(subcheck => {
+            subcheck.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const subquestId = this.dataset.subquest;
+                const wasCompleted = data.subquests[subquestId];
+                
+                data.subquests[subquestId] = !wasCompleted;
+                
+                if (!wasCompleted) {
+                    const now = new Date();
+                    data.lastCompletedDate = now.toDateString();
+                    addXP(10);
+                    
+                    checkAllQuestsCompleted();
+                } else {
+                    data.totalXP = Math.max(0, data.totalXP - 10);
+                    data.level = Math.floor(data.totalXP / 100) + 1;
+                }
+                
+                saveData();
+                updateUI();
+            });
+        });
+
+        function checkAllQuestsCompleted() {
+            let completed = 0;
+            const total = document.querySelectorAll('.quest-item').length;
+            
+            // Conta quests normais
+            document.querySelectorAll('.quest-item:not(.multi-quest)').forEach(item => {
+                if (data.quests[item.dataset.quest]) {
+                    completed++;
+                }
+            });
+            
+            // Conta multi-quests
+            const expedicaoCompleted = ['expedicao-1', 'expedicao-2', 'expedicao-3'].every(id => data.subquests[id]);
+            const infernalCompleted = ['infernal-1', 'infernal-2'].every(id => data.subquests[id]);
+            
+            if (expedicaoCompleted) completed++;
+            if (infernalCompleted) completed++;
+            
+            if (completed === total) {
+                addXP(50);
+                showAchievement('Todas as quests completadas! +50 XP Bônus!');
+                document.querySelector('.stats-container').classList.add('celebrating');
                 setTimeout(() => {
-                    installBanner.classList.add('show');
-                }, 3000);
+                    document.querySelector('.stats-container').classList.remove('celebrating');
+                }, 500);
             }
-        });
+        }
 
-        installBtn.addEventListener('click', async () => {
-            if (!deferredPrompt) return;
-            
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            
-            if (outcome === 'accepted') {
-                console.log('User accepted the install prompt');
-            }
-            
-            deferredPrompt = null;
-            installBanner.classList.remove('show');
-        });
-
-        dismissBtn.addEventListener('click', () => {
-            installBanner.classList.remove('show');
-            localStorage.setItem('installDismissed', 'true');
-        });
-
-        window.addEventListener('appinstalled', () => {
-            console.log('PWA was installed');
-            installBanner.classList.remove('show');
-        });
+        loadData();
+        updateTimer();
+        setInterval(updateTimer, 1000);
+        setInterval(checkDailyReset, 60000);
+        setInterval(checkQuestNotifications, 60000); // Verifica notificações a cada minuto
+        checkQuestNotifications(); // Verifica imediatamente ao carregar
     </script>
 </body>
 </html>

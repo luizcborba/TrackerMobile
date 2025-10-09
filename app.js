@@ -44,8 +44,11 @@ const questsData = [
 
 // Inicializar aplicação
 function initializeApp() {
+    console.log('Inicializando aplicação...');
     loadData();
+    console.log('Dados carregados:', data);
     updateUI();
+    console.log('Interface atualizada');
     updateTimeToReset();
     
     // Verificar se precisa resetar as quests
@@ -61,6 +64,7 @@ function initializeApp() {
     
     // Inicializar notificações
     initializeNotifications();
+    console.log('Aplicação inicializada com sucesso!');
 }
 
 // Carregar dados salvos
@@ -212,7 +216,7 @@ function updateUI() {
 // Atualizar estatísticas
 function updateStats() {
     document.getElementById('level').textContent = data.level;
-    document.getElementById('xp').textContent = data.totalXP;
+    document.getElementById('totalXP').textContent = data.totalXP;
     document.getElementById('streak').textContent = data.streak;
     
     // Calcular XP até próximo nível
@@ -221,22 +225,36 @@ function updateStats() {
     const progressXP = data.totalXP - currentLevelXP;
     const neededXP = nextLevelXP - data.totalXP;
     
-    document.getElementById('nextLevel').textContent = neededXP;
-    
-    // Barra de progresso
+    // Atualizar barra de progresso
     const progressPercent = (progressXP / 1000) * 100;
-    document.getElementById('progressBar').style.width = progressPercent + '%';
+    document.getElementById('levelProgress').style.width = progressPercent + '%';
+    
+    // Atualizar contador de quests completas
+    const completedQuests = Object.values(data.quests).filter(q => q).length;
+    document.getElementById('completed').textContent = completedQuests;
+    document.getElementById('total').textContent = questsData.length;
 }
 
 // Atualizar lista de quests
 function updateQuestList() {
+    console.log('Atualizando lista de quests...');
     const questList = document.getElementById('questList');
+    
+    if (!questList) {
+        console.error('Elemento questList não encontrado!');
+        return;
+    }
+    
+    console.log('Elemento questList encontrado, gerando quests...');
     questList.innerHTML = '';
     
     questsData.forEach(quest => {
+        console.log('Criando quest:', quest.name);
         const questElement = createQuestElement(quest);
         questList.appendChild(questElement);
     });
+    
+    console.log('Lista de quests atualizada com', questsData.length, 'quests');
 }
 
 // Criar elemento de quest
@@ -266,7 +284,7 @@ function createQuestElement(quest) {
                 ${quest.subquests.map(subquest => `
                     <div class="subquest-item ${data.subquests[subquest.id] ? 'completed' : ''}" 
                          onclick="toggleSubquest('${subquest.id}')">
-                        <span class="checkbox">${data.subquests[subquest.id] ? '✅' : '⬜'}</span>
+                        <div class="quest-subcheck">${data.subquests[subquest.id] ? '✅' : ''}</div>
                         <span>${subquest.name}</span>
                         <span class="xp">+${subquest.xp} XP</span>
                     </div>
@@ -277,14 +295,14 @@ function createQuestElement(quest) {
     
     questDiv.innerHTML = `
         <div class="quest-header" onclick="toggleQuest('${quest.id}')">
+            <div class="quest-checkbox">${isCompleted ? '✅' : ''}</div>
             <div class="quest-info">
-                <span class="quest-emoji">${quest.emoji}</span>
-                <span class="quest-name">${quest.name}</span>
-                <span class="quest-category ${quest.category}">${getCategoryName(quest.category)}</span>
-            </div>
-            <div class="quest-reward">
-                <span class="xp">+${quest.xp} XP</span>
-                <span class="checkbox">${isCompleted ? '✅' : '⬜'}</span>
+                <div class="quest-name">
+                    <span class="quest-emoji">${quest.emoji}</span>
+                    ${quest.name}
+                    <span class="quest-tag ${quest.category}">${getCategoryName(quest.category)}</span>
+                </div>
+                <div class="quest-description">+${quest.xp} XP</div>
             </div>
         </div>
         ${subquestHTML}
@@ -315,8 +333,9 @@ function updateTimeToReset() {
     const timeLeft = tomorrow - now;
     const hours = Math.floor(timeLeft / (1000 * 60 * 60));
     const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
     
-    document.getElementById('timeToReset').textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    document.getElementById('resetTimer').textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
 // Sistema de notificações
