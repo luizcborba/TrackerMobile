@@ -747,7 +747,61 @@
 
         // Initialize Cloud Sync
         window.addEventListener('load', () => {
-            cloudSync.initGoogleAuth();
+    <script src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-sync.js"></script>
+    <script>
+        // Process auth tokens from URL hash on page load
+        function processAuthFromURL() {
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            const accessToken = hashParams.get('access_token');
+            const refreshToken = hashParams.get('refresh_token');
+            
+            if (accessToken && window.supabaseSync) {
+                console.log('🔐 Tokens encontrados na URL, processando...');
+                
+                // Set session with tokens
+                window.supabaseSync.supabase.auth.setSession({
+                    access_token: accessToken,
+                    refresh_token: refreshToken
+                }).then(({ data, error }) => {
+                    if (error) {
+                        console.error('❌ Erro ao definir sessão:', error);
+                    } else {
+                        console.log('✅ Sessão definida com sucesso!');
+                        window.supabaseSync.user = data.user;
+                        window.supabaseSync.updateUI();
+                        
+                        // Clear URL hash
+                        window.location.hash = '';
+                        
+                        showAchievement('🎉 Login realizado com sucesso!');
+                    }
+                });
+            }
+        }
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+        // Initialize everything when page loads
+        window.addEventListener('load', () => {
+            // Wait a bit for supabaseSync to initialize, then process auth
+            setTimeout(() => {
+                if (window.supabaseSync) {
+                    processAuthFromURL();
+                }
+            }, 1000);
         });
 
         // PWA Install Prompt

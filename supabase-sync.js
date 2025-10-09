@@ -1,6 +1,6 @@
 // Configuração do Supabase
-const SUPABASE_URL = 'https://qhmgdguuxmnzpousatrn.supabase.co'; // Você precisará substituir pela sua URL
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFobWdkZ3V1eG1uenBvdXNhdHJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5NjA4MDMsImV4cCI6MjA3NTUzNjgwM30.AIdD2iVHQi_nOqiCxybHlaDNW6M9Q2LCTB7v2is-RlY'; // Você precisará substituir pela sua chave
+const SUPABASE_URL = 'https://qhmgdguuxmnzpousatrn.supabase.co'; 
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFobWdkZ3V1eG1uenBvdXNhdHJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgxOTk3NjEsImV4cCI6MjA0Mzc3NTc2MX0.LYJBNOQqcEq1yGFU-DfWnFqHDMl3uGN4zIVR0b-OUZQ';
 
 class SupabaseSync {
     constructor() {
@@ -59,7 +59,7 @@ class SupabaseSync {
             const { error } = await this.supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: window.location.origin
+                    redirectTo: 'https://luizcborba.github.io/TrackerMobile/index.html'
                 }
             });
 
