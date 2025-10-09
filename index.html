@@ -778,8 +778,7 @@
         </div>
     </div>
 
-    <script src="simple-sync.js"></script>
-    <script src="modern-google-auth.js"></script>
+    <script src="ultimate-sync.js"></script>
     <script src="app.js"></script>
     <script>
         // Register Service Worker
@@ -793,6 +792,16 @@
                         console.log('SW registration failed: ', registrationError);
                     });
             });
+        }
+
+        // Inicializar Ultimate Sync
+        document.addEventListener('DOMContentLoaded', function() {
+            ultimateSync.init();
+        });
+        
+        // Se GAPI já estiver carregado
+        if (window.gapi) {
+            ultimateSync.init();
         }
 
         // Initialize Cloud Sync
