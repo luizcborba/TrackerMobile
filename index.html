@@ -11,7 +11,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="WYD Tracker">
+    <meta name="apple-touch-fullscreen" content="yes">
     <meta name="msapplication-TileColor" content="#1f1f1f">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="WYD Tracker">
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="./manifest.json">
@@ -19,6 +22,7 @@
     <!-- Ícones para diferentes dispositivos -->
     <link rel="icon" type="image/png" href="./icon-192x192.png">
     <link rel="apple-touch-icon" href="./icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="./icon-192x192.png">
     <link rel="shortcut icon" href="./icon-192x192.png">
     
     <style>
@@ -874,29 +878,74 @@
 
         // PWA Installation Prompt
         let deferredPrompt;
+        let installPromptShown = false;
 
         window.addEventListener('beforeinstallprompt', (e) => {
             console.log('PWA: Prompt de instalação disponível');
             e.preventDefault();
             deferredPrompt = e;
+            installPromptShown = true;
             
-            // Mostra uma notificação discreta sobre instalação
+            // Mostra uma notificação discreta sobre instalação após 5 segundos
             setTimeout(() => {
-                if (deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
-                    showAchievement('💾 Dica: Você pode instalar este app na tela inicial!');
+                if (deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches && !localStorage.getItem('pwaInstallDismissed')) {
+                    showPWAInstallPrompt();
                 }
-            }, 10000); // Após 10 segundos
+            }, 5000);
         });
+
+        function showPWAInstallPrompt() {
+            const popup = document.getElementById('achievementPopup');
+            const closeBtn = document.getElementById('notificationClose');
+            
+            document.getElementById('achievementText').textContent = '� Instalar WYD Tracker na tela inicial?';
+            popup.classList.add('show', 'persistent');
+            closeBtn.style.display = 'block';
+            closeBtn.textContent = '📲 Instalar App';
+            
+            closeBtn.onclick = () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('PWA: Usuário aceitou a instalação');
+                        } else {
+                            console.log('PWA: Usuário recusou a instalação');
+                            localStorage.setItem('pwaInstallDismissed', 'true');
+                        }
+                        deferredPrompt = null;
+                    });
+                } else {
+                    localStorage.setItem('pwaInstallDismissed', 'true');
+                }
+                popup.classList.remove('show', 'persistent');
+                popup.style.animation = '';
+                closeBtn.style.display = 'none';
+                closeBtn.textContent = '✅ Confirmado! Parar aviso';
+            };
+        }
 
         window.addEventListener('appinstalled', () => {
             console.log('PWA: App foi instalado');
             showAchievement('✅ WYD Quest Tracker instalado com sucesso!');
+            localStorage.removeItem('pwaInstallDismissed');
             deferredPrompt = null;
         });
 
         // Detecta se já está executando como PWA
-        if (window.matchMedia('(display-mode: standalone)').matches) {
+        if (isInStandaloneMode()) {
             console.log('PWA: Executando como app instalado');
+        } else if (!installPromptShown && !localStorage.getItem('pwaInstallDismissed')) {
+            // Para dispositivos móveis
+            setTimeout(() => {
+                if (isIOS() && !isInStandaloneMode()) {
+                    showIOSInstallInstructions();
+                } else if (/Android/i.test(navigator.userAgent)) {
+                    showAchievement('💡 Dica: Toque no menu ⋮ e selecione "Adicionar à tela inicial"');
+                } else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                    showIOSInstallInstructions();
+                }
+            }, 8000);
         }
 
         loadData();
@@ -912,11 +961,45 @@
                 navigator.serviceWorker.register('./sw.js')
                     .then(function(registration) {
                         console.log('Service Worker registrado com sucesso:', registration.scope);
+                        
+                        // Força uma verificação de atualização
+                        registration.addEventListener('updatefound', () => {
+                            console.log('Nova versão do Service Worker encontrada');
+                        });
                     })
                     .catch(function(error) {
                         console.log('Falha ao registrar Service Worker:', error);
                     });
             });
+        }
+
+        // Função para detectar iOS
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        }
+
+        // Função para detectar se está no Safari
+        function isInStandaloneMode() {
+            return (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
+        }
+
+        // Mostra instruções específicas para iOS
+        function showIOSInstallInstructions() {
+            const popup = document.getElementById('achievementPopup');
+            const closeBtn = document.getElementById('notificationClose');
+            
+            document.getElementById('achievementText').textContent = '📱 Para instalar: toque em Compartilhar 📤 e depois "Adicionar à Tela de Início"';
+            popup.classList.add('show', 'persistent');
+            closeBtn.style.display = 'block';
+            closeBtn.textContent = '✅ Entendi!';
+            
+            closeBtn.onclick = () => {
+                localStorage.setItem('pwaInstallDismissed', 'true');
+                popup.classList.remove('show', 'persistent');
+                popup.style.animation = '';
+                closeBtn.style.display = 'none';
+                closeBtn.textContent = '✅ Confirmado! Parar aviso';
+            };
         }
     </script>
 </body>
