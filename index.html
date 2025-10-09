@@ -1,488 +1,994 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WYD Quest Tracker</title>
-    
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#2a2a2a">
-    <meta name="description" content="Acompanhe suas missões diárias do WYD">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="WYD Quest Tracker">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png">
-    <link rel="apple-touch-icon" href="icon-192x192.png">
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<!DOCTYPE html><!DOCTYPE html>
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 50%, #151515 100%);
-            min-height: 100vh;
-            padding: 10px;
-            color: #e0e0e0;
-            transition: background 0.3s ease, color 0.3s ease;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
+<html lang="pt-BR"><html lang="pt-BR">
 
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 0;
-        }
+<head><head>
 
-        .header {
-            text-align: center;
+    <meta charset="UTF-8">    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>WYD Quest Tracker</title>    <title>WYD Quest Tracker</title>
+
+        
+
+    <!-- PWA Meta Tags -->    <!-- PWA Meta Tags -->
+
+    <meta name="theme-color" content="#8b5a2b">    <meta name="theme-color" content="#2a2a2a">
+
+    <meta name="description" content="Acompanhe suas missões diárias do WYD">    <meta name="description" content="Acompanhe suas missões diárias do WYD">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+    <meta name="apple-mobile-web-app-title" content="WYD Quest Tracker">    <meta name="apple-mobile-web-app-title" content="WYD Quest Tracker">
+
+        
+
+    <!-- PWA Manifest -->    <!-- PWA Manifest -->
+
+    <link rel="manifest" href="manifest.json">    <link rel="manifest" href="manifest.json">
+
+        
+
+    <!-- Favicon -->    <!-- Favicon -->
+
+    <link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">    <link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
+
+    <link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png">    <link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png">
+
+    <link rel="apple-touch-icon" href="icon-192x192.png">    <link rel="apple-touch-icon" href="icon-192x192.png">
+
+        
+
+    <style>    <style>
+
+        * {        * {
+
+            margin: 0;            margin: 0;
+
+            padding: 0;            padding: 0;
+
+            box-sizing: border-box;            box-sizing: border-box;
+
+        }        }
+
+
+
+        body {        body {
+
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+            background: linear-gradient(135deg, #d4b896 0%, #c9a876 50%, #b89968 100%);            background: linear-gradient(135deg, #d4b896 0%, #c9a876 50%, #b89968 100%);
+
+            min-height: 100vh;            min-height: 100vh;
+
+            padding: 10px;            padding: 10px;
+
+            color: #5a3e2b;            color: #5a3e2b;
+
+            transition: background 0.3s ease, color 0.3s ease;            transition: background 0.3s ease, color 0.3s ease;
+
+            -webkit-tap-highlight-color: transparent;            -webkit-tap-highlight-color: transparent;
+
+            user-select: none;            user-select: none;
+
+        }        }
+
+
+
+        body.dark-theme {        body.dark-theme {
+
+            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 50%, #151515 100%);            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 50%, #151515 100%);
+
+            color: #e0e0e0;            color: #e0e0e0;
+
+        }        }
+
+
+
+        .container {        .container {
+
+            max-width: 100%;            max-width: 100%;
+
+            margin: 0 auto;            margin: 0 auto;
+
+            padding: 0;            padding: 0;
+
+        }        }
+
+
+
+        .header {        .header {
+
+            text-align: center;            text-align: center;
+
+            margin-bottom: 15px;            margin-bottom: 15px;
+
+            padding: 15px 10px;            padding: 15px 10px;
+
+            background: rgba(139, 90, 43, 0.15);            background: rgba(139, 90, 43, 0.15);
+
+            border-radius: 12px;            border-radius: 12px;
+
+            border: 2px solid rgba(139, 90, 43, 0.4);            border: 2px solid rgba(139, 90, 43, 0.4);
+
+            box-shadow: 0 4px 16px rgba(90, 62, 43, 0.2);            box-shadow: 0 4px 16px rgba(90, 62, 43, 0.2);
+
+            position: relative;            position: relative;
+
+        }        }
+
+
+
+        body.dark-theme .header {        body.dark-theme .header {
+
+            background: rgba(0, 0, 0, 0.3);            background: rgba(0, 0, 0, 0.3);
+
+            border-color: rgba(230, 126, 34, 0.4);            border-color: rgba(230, 126, 34, 0.4);
+
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+
+        }        }
+
+
+
+        .header h1 {        .header h1 {
+
+            color: #8b5a2b;            color: #e67e22;
+
+            font-size: 1.6em;            font-size: 1.6em;
+
+            text-shadow: 0 0 15px rgba(139, 90, 43, 0.3);            text-shadow: 0 0 15px rgba(230, 126, 34, 0.5);
+
+            margin-bottom: 5px;            margin-bottom: 5px;
+
+        }        }
+
+
+
+        body.dark-theme .header h1 {        .header p {
+
+            color: #e67e22;            font-size: 0.85em;
+
+            text-shadow: 0 0 15px rgba(230, 126, 34, 0.5);            color: #bbb;
+
+        }        }
+
+
+
+        .header p {        .stats-container {
+
+            font-size: 0.85em;            display: grid;
+
+            color: #6b4423;            grid-template-columns: repeat(2, 1fr);
+
+        }            gap: 10px;
+
             margin-bottom: 15px;
-            padding: 15px 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            border: 2px solid rgba(230, 126, 34, 0.4);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-            position: relative;
-        }
 
-        .header h1 {
-            color: #e67e22;
-            font-size: 1.6em;
-            text-shadow: 0 0 15px rgba(230, 126, 34, 0.5);
-            margin-bottom: 5px;
-        }
+        body.dark-theme .header p {        }
 
-        .header p {
-            font-size: 0.85em;
             color: #bbb;
-        }
 
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
+        }        .stat-card {
+
+            background: rgba(0, 0, 0, 0.3);
+
+        .stats-container {            padding: 15px 10px;
+
+            display: grid;            border-radius: 10px;
+
+            grid-template-columns: repeat(2, 1fr);            border: 2px solid rgba(230, 126, 34, 0.4);
+
+            gap: 10px;            text-align: center;
+
+            margin-bottom: 15px;            transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+        }            touch-action: manipulation;
+
         }
 
         .stat-card {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px 10px;
-            border-radius: 10px;
-            border: 2px solid rgba(230, 126, 34, 0.4);
-            text-align: center;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            touch-action: manipulation;
-        }
 
-        .stat-card:active {
-            transform: scale(0.98);
+            background: rgba(139, 90, 43, 0.1);        .stat-card:active {
+
+            padding: 15px 10px;            transform: scale(0.98);
+
+            border-radius: 10px;        }
+
+            border: 2px solid rgba(139, 90, 43, 0.3);
+
+            text-align: center;        .stat-label {
+
+            transition: transform 0.2s ease, box-shadow 0.2s ease;            color: #bbb;
+
+            touch-action: manipulation;            font-size: 0.75em;
+
+        }            margin-bottom: 8px;
+
+            text-transform: uppercase;
+
+        body.dark-theme .stat-card {            letter-spacing: 0.5px;
+
+            background: rgba(0, 0, 0, 0.3);        }
+
+            border-color: rgba(230, 126, 34, 0.4);
+
+        }        .stat-value {
+
+            color: #e67e22;
+
+        .stat-card:active {            font-size: 1.8em;
+
+            transform: scale(0.98);            font-weight: bold;
+
+        }            text-shadow: 0 0 8px rgba(230, 126, 34, 0.5);
+
         }
 
         .stat-label {
-            color: #bbb;
-            font-size: 0.75em;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+
+            color: #8b5a2b;        .level-bar {
+
+            font-size: 0.75em;            background: rgba(255, 255, 255, 0.1);
+
+            margin-bottom: 8px;            height: 10px;
+
+            text-transform: uppercase;            border-radius: 5px;
+
+            letter-spacing: 0.5px;            margin-top: 10px;
+
+        }            overflow: hidden;
+
         }
 
-        .stat-value {
-            color: #e67e22;
-            font-size: 1.8em;
-            font-weight: bold;
-            text-shadow: 0 0 8px rgba(230, 126, 34, 0.5);
-        }
+        body.dark-theme .stat-label {
 
-        .level-bar {
-            background: rgba(255, 255, 255, 0.1);
-            height: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
+            color: #bbb;        .level-progress {
 
-        .level-progress {
-            height: 100%;
+        }            height: 100%;
+
             background: linear-gradient(90deg, #e67e22, #f39c12);
-            transition: width 0.5s ease;
-            box-shadow: 0 0 10px rgba(230, 126, 34, 0.5);
-        }
 
-        .quests-container {
-            background: rgba(139, 90, 43, 0.1);
+        .stat-value {            transition: width 0.5s ease;
+
+            color: #8b5a2b;            box-shadow: 0 0 10px rgba(230, 126, 34, 0.5);
+
+            font-size: 1.8em;        }
+
+            font-weight: bold;
+
+            text-shadow: 0 0 8px rgba(139, 90, 43, 0.3);        .quests-container {
+
+        }            background: rgba(139, 90, 43, 0.1);
+
             padding: 15px 10px;
-            border-radius: 12px;
-            border: 2px solid rgba(139, 90, 43, 0.3);
-            box-shadow: 0 4px 16px rgba(90, 62, 43, 0.2);
-        }
 
-            background: rgba(0, 0, 0, 0.3);
-            border-color: rgba(230, 126, 34, 0.4);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-        }
+        body.dark-theme .stat-value {            border-radius: 12px;
 
-        .quest-item {
-            background: rgba(212, 184, 150, 0.3);
+            color: #e67e22;            border: 2px solid rgba(139, 90, 43, 0.3);
+
+            text-shadow: 0 0 8px rgba(230, 126, 34, 0.5);            box-shadow: 0 4px 16px rgba(90, 62, 43, 0.2);
+
+        }        }
+
+
+
+        .level-bar {            background: rgba(0, 0, 0, 0.3);
+
+            background: rgba(255, 255, 255, 0.1);            border-color: rgba(230, 126, 34, 0.4);
+
+            height: 10px;            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+
+            border-radius: 5px;        }
+
+            margin-top: 10px;
+
+            overflow: hidden;        .quest-item {
+
+        }            background: rgba(212, 184, 150, 0.3);
+
             padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            border: 2px solid rgba(139, 90, 43, 0.2);
-            display: flex;
-            align-items: center;
-            transition: all 0.2s ease;
+
+        .level-progress {            margin-bottom: 10px;
+
+            height: 100%;            border-radius: 10px;
+
+            background: linear-gradient(90deg, #8b5a2b, #a67c52);            border: 2px solid rgba(139, 90, 43, 0.2);
+
+            transition: width 0.5s ease;            display: flex;
+
+            box-shadow: 0 0 10px rgba(139, 90, 43, 0.5);            align-items: center;
+
+        }            transition: all 0.2s ease;
+
             cursor: pointer;
-            touch-action: manipulation;
-            min-height: 60px;
+
+        body.dark-theme .level-progress {            touch-action: manipulation;
+
+            background: linear-gradient(90deg, #e67e22, #f39c12);            min-height: 60px;
+
+            box-shadow: 0 0 10px rgba(230, 126, 34, 0.5);        }
+
         }
 
             background: rgba(0, 0, 0, 0.2);
+
+        .quests-container {            border-color: rgba(255, 255, 255, 0.15);
+
+            background: rgba(139, 90, 43, 0.1);        }
+
+            padding: 15px 10px;
+
+            border-radius: 12px;        .quest-item:active {
+
+            border: 2px solid rgba(139, 90, 43, 0.3);            transform: scale(0.98);
+
+            box-shadow: 0 4px 16px rgba(90, 62, 43, 0.2);            border-color: rgba(230, 126, 34, 0.6);
+
+        }        }
+
+
+
+        body.dark-theme .quests-container {            border-color: rgba(230, 126, 34, 0.7);
+
+            background: rgba(0, 0, 0, 0.3);            background: rgba(230, 126, 34, 0.2);
+
+            border-color: rgba(230, 126, 34, 0.4);        }
+
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+
+        }        .quest-item.completed {
+
+            background: rgba(46, 204, 113, 0.1);
+
+        .quest-item {            border-color: rgba(46, 204, 113, 0.3);
+
+            background: rgba(212, 184, 150, 0.3);            opacity: 0.7;
+
+            padding: 12px;        }
+
+            margin-bottom: 10px;
+
+            border-radius: 10px;        .quest-checkbox {
+
+            border: 2px solid rgba(139, 90, 43, 0.2);            width: 28px;
+
+            display: flex;            height: 28px;
+
+            align-items: center;            border: 3px solid #e67e22;
+
+            transition: all 0.2s ease;            border-radius: 5px;
+
+            cursor: pointer;            margin-right: 12px;
+
+            touch-action: manipulation;            display: flex;
+
+            min-height: 60px;            align-items: center;
+
+        }            justify-content: center;
+
+            flex-shrink: 0;
+
+        body.dark-theme .quest-item {            transition: all 0.2s ease;
+
+            background: rgba(0, 0, 0, 0.2);        }
+
             border-color: rgba(255, 255, 255, 0.15);
+
+        }            border-color: #e67e22;
+
         }
 
         .quest-item:active {
-            transform: scale(0.98);
-            border-color: rgba(230, 126, 34, 0.6);
+
+            transform: scale(0.98);        .quest-item.completed .quest-checkbox {
+
+            border-color: rgba(139, 90, 43, 0.6);            background: #2ecc71;
+
+        }            border-color: #2ecc71;
+
         }
 
-            border-color: rgba(230, 126, 34, 0.7);
-            background: rgba(230, 126, 34, 0.2);
-        }
+        body.dark-theme .quest-item:active {
 
-        .quest-item.completed {
-            background: rgba(46, 204, 113, 0.1);
-            border-color: rgba(46, 204, 113, 0.3);
-            opacity: 0.7;
-        }
+            border-color: rgba(230, 126, 34, 0.7);        .quest-checkbox::after {
 
-        .quest-checkbox {
-            width: 28px;
-            height: 28px;
-            border: 3px solid #e67e22;
-            border-radius: 5px;
-            margin-right: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: all 0.2s ease;
-        }
+            background: rgba(230, 126, 34, 0.2);            content: '✓';
 
-            border-color: #e67e22;
-        }
+        }            color: #fff;
 
-        .quest-item.completed .quest-checkbox {
-            background: #2ecc71;
-            border-color: #2ecc71;
-        }
-
-        .quest-checkbox::after {
-            content: '✓';
-            color: #fff;
             font-size: 18px;
-            font-weight: bold;
-            opacity: 0;
-            transition: opacity 0.2s ease;
+
+        .quest-item.completed {            font-weight: bold;
+
+            background: rgba(46, 204, 113, 0.1);            opacity: 0;
+
+            border-color: rgba(46, 204, 113, 0.3);            transition: opacity 0.2s ease;
+
+            opacity: 0.7;        }
+
         }
 
         .quest-item.completed .quest-checkbox::after {
-            opacity: 1;
-        }
 
-        .quest-item.multi-quest {
-            flex-direction: row;
-            padding: 12px;
-        }
+        .quest-checkbox {            opacity: 1;
 
-        .quest-subcheck {
-            width: 28px;
+            width: 28px;        }
+
             height: 28px;
-            border: 3px solid #e67e22;
-            border-radius: 5px;
-            display: flex;
+
+            border: 3px solid #8b5a2b;        .quest-item.multi-quest {
+
+            border-radius: 5px;            flex-direction: row;
+
+            margin-right: 12px;            padding: 12px;
+
+            display: flex;        }
+
             align-items: center;
-            justify-content: center;
+
+            justify-content: center;        .quest-subcheck {
+
+            flex-shrink: 0;            width: 28px;
+
+            transition: all 0.2s ease;            height: 28px;
+
+        }            border: 3px solid #e67e22;
+
+            border-radius: 5px;
+
+        body.dark-theme .quest-checkbox {            display: flex;
+
+            border-color: #e67e22;            align-items: center;
+
+        }            justify-content: center;
+
             cursor: pointer;
-            transition: all 0.2s ease;
-            touch-action: manipulation;
-            flex-shrink: 0;
-            margin-right: 8px;
+
+        .quest-item.completed .quest-checkbox {            transition: all 0.2s ease;
+
+            background: #2ecc71;            touch-action: manipulation;
+
+            border-color: #2ecc71;            flex-shrink: 0;
+
+        }            margin-right: 8px;
+
         }
 
-            border-color: #e67e22;
-        }
+        .quest-checkbox::after {
 
-        .quest-subcheck:active {
-            transform: scale(0.95);
+            content: '✓';            border-color: #e67e22;
+
+            color: #fff;        }
+
+            font-size: 18px;
+
+            font-weight: bold;        .quest-subcheck:active {
+
+            opacity: 0;            transform: scale(0.95);
+
+            transition: opacity 0.2s ease;        }
+
         }
 
         .quest-subcheck:last-child {
-            margin-right: 0;
+
+        .quest-item.completed .quest-checkbox::after {            margin-right: 0;
+
+            opacity: 1;        }
+
         }
 
         .quest-subcheck.completed {
-            background: #2ecc71;
-            border-color: #2ecc71;
-        }
 
-        .quest-subcheck::after {
-            content: '✓';
-            color: #fff;
-            font-size: 18px;
-            font-weight: bold;
-            opacity: 0;
+        .quest-info {            background: #2ecc71;
+
+            flex: 1;            border-color: #2ecc71;
+
+        }        }
+
+
+
+        .quest-name {        .quest-subcheck::after {
+
+            font-size: 1.05em;            content: '✓';
+
+            font-weight: bold;            color: #fff;
+
+            margin-bottom: 4px;            font-size: 18px;
+
+            color: #5a3e2b;            font-weight: bold;
+
+        }            opacity: 0;
+
             transition: opacity 0.2s ease;
-        }
 
-        .quest-subcheck.completed::after {
+        body.dark-theme .quest-name {        }
+
+            color: #e0e0e0;
+
+        }        .quest-subcheck.completed::after {
+
             opacity: 1;
-        }
 
-        .quest-subchecks-container {
-            display: flex;
-            align-items: center;
-            gap: 0;
+        .quest-description {        }
+
+            color: #8b5a2b;
+
+            font-size: 0.85em;        .quest-subchecks-container {
+
+            margin-top: 3px;            display: flex;
+
+            opacity: 0.8;            align-items: center;
+
+        }            gap: 0;
+
             margin-right: 12px;
-        }
 
-        .quest-info {
-            flex: 1;
-        }
-
-        .quest-name {
-            font-size: 1.05em;
-            font-weight: bold;
-            margin-bottom: 4px;
-            color: #e0e0e0;
-        }
-
-            color: #e0e0e0;
-        }
-
-        .quest-tag {
-            display: inline-block;
-            padding: 2px 8px;
-            background: rgba(139, 90, 43, 0.2);
-            border: 1px solid #e67e22;
-            border-radius: 5px;
-            font-size: 0.7em;
-            margin-right: 8px;
-            color: #e67e22;
-        }
-
-            background: rgba(231, 76, 60, 0.3);
-            border-color: #e74c3c;
-            color: #e74c3c;
-        }
-
-        .quest-description {
-            color: #e67e22;
-            font-size: 0.85em;
-            margin-top: 3px;
-            opacity: 0.8;
-        }
+        body.dark-theme .quest-description {        }
 
             color: #999;
+
+        }        .quest-info {
+
+            flex: 1;
+
+        .reset-timer {        }
+
+            text-align: center;
+
+            margin-top: 15px;        .quest-name {
+
+            padding: 12px;            font-size: 1.05em;
+
+            background: rgba(139, 90, 43, 0.15);            font-weight: bold;
+
+            border-radius: 10px;            margin-bottom: 4px;
+
+            color: #8b5a2b;            color: #e0e0e0;
+
+            font-size: 0.85em;        }
+
         }
 
-        .reset-timer {
-            text-align: center;
-            margin-top: 15px;
-            padding: 12px;
-            background: rgba(139, 90, 43, 0.15);
-            border-radius: 10px;
-            color: #bbb;
-            font-size: 0.85em;
-        }
+            color: #e0e0e0;
+
+        body.dark-theme .reset-timer {        }
 
             background: rgba(0, 0, 0, 0.4);
+
+            color: #95a5a6;        .quest-tag {
+
+        }            display: inline-block;
+
+            padding: 2px 8px;
+
+        /* Achievements */            background: rgba(139, 90, 43, 0.2);
+
+        .achievement {            border: 1px solid #e67e22;
+
+            position: fixed;            border-radius: 5px;
+
+            top: 20px;            font-size: 0.7em;
+
+            left: 50%;            margin-right: 8px;
+
+            transform: translateX(-50%) translateY(-100px);            color: #e67e22;
+
+            background: linear-gradient(135deg, #8b5a2b, #a67c52);        }
+
+            color: white;
+
+            padding: 15px 20px;            background: rgba(231, 76, 60, 0.3);
+
+            border-radius: 10px;            border-color: #e74c3c;
+
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);            color: #e74c3c;
+
+            z-index: 1000;        }
+
+            font-weight: bold;
+
+            text-align: center;        .quest-description {
+
+            transition: transform 0.3s ease;            color: #e67e22;
+
+            max-width: 300px;            font-size: 0.85em;
+
+        }            margin-top: 3px;
+
+            opacity: 0.8;
+
+        body.dark-theme .achievement {        }
+
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+
+        }            color: #999;
+
+        }
+
+        .achievement.show {
+
+            transform: translateX(-50%) translateY(0);        .reset-timer {
+
+        }            text-align: center;
+
+            margin-top: 15px;
+
+        @keyframes celebration {            padding: 12px;
+
+            0%, 100% { transform: scale(1); }            background: rgba(139, 90, 43, 0.15);
+
+            50% { transform: scale(1.1); }            border-radius: 10px;
+
+        }            color: #bbb;
+
+            font-size: 0.85em;
+
+        .celebrating {        }
+
+            animation: celebration 0.5s ease;
+
+        }            background: rgba(0, 0, 0, 0.4);
+
             color: #95a5a6;
+
+        /* PWA Install Banner */        }
+
+        .install-banner {
+
+            position: fixed;        .achievement-popup {
+
+            bottom: 20px;            position: fixed;
+
+            left: 20px;            top: 15px;
+
+            right: 20px;            left: 10px;
+
+            background: linear-gradient(135deg, #8b5a2b, #a67c52);            right: 10px;
+
+            padding: 15px;            background: linear-gradient(135deg, #e67e22, #f39c12);
+
+            border-radius: 10px;            padding: 15px;
+
+            box-shadow: 0 8px 30px rgba(90, 62, 43, 0.5);            border-radius: 10px;
+
+            transform: translateY(100px);            box-shadow: 0 8px 30px rgba(90, 62, 43, 0.5);
+
+            transition: transform 0.4s ease;            transform: translateY(-150px);
+
+            z-index: 1001;            transition: transform 0.4s ease;
+
+            display: none;            z-index: 1000;
+
+        }            max-width: calc(100% - 20px);
+
         }
 
-        .achievement-popup {
-            position: fixed;
-            top: 15px;
-            left: 10px;
-            right: 10px;
-            background: linear-gradient(135deg, #e67e22, #f39c12);
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 8px 30px rgba(90, 62, 43, 0.5);
-            transform: translateY(-150px);
-            transition: transform 0.4s ease;
-            z-index: 1000;
-            max-width: calc(100% - 20px);
-        }
+        body.dark-theme .install-banner {
 
-            background: linear-gradient(135deg, #e67e22, #f39c12);
-        }
+            background: linear-gradient(135deg, #e67e22, #f39c12);            background: linear-gradient(135deg, #e67e22, #f39c12);
 
-        .achievement-popup.show {
-            transform: translateY(0);
+        }        }
+
+
+
+        .install-banner.show {        .achievement-popup.show {
+
+            transform: translateY(0);            transform: translateY(0);
+
+            display: block;        }
+
         }
 
         .achievement-popup.persistent {
-            animation: pulse 2s ease-in-out infinite;
-        }
 
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 8px 30px rgba(90, 62, 43, 0.5); }
-            50% { box-shadow: 0 8px 40px rgba(230, 126, 34, 0.8); }
-        }
+        .install-banner-text {            animation: pulse 2s ease-in-out infinite;
 
-        .achievement-title {
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #fff;
-        }
+            color: #fff;        }
 
-        .achievement-text {
-            font-size: 0.85em;
-            color: #fff;
-            margin-bottom: 10px;
-        }
-
-        .notification-close {
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.85em;
-            font-weight: bold;
-            margin-top: 10px;
-            transition: all 0.2s ease;
-            touch-action: manipulation;
-        }
-
-        .notification-close:active {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(0.95);
-        }
-
-        @keyframes celebration {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .celebrating {
-            animation: celebration 0.5s ease;
-        }
-
-
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-
-            color: #bbb;
-        }
-
-        /* Cloud sync indicator */
-        .sync-indicator {
-            display: inline-block;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
-        }
-
-        /* PWA Install Banner */
-        .install-banner {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #e67e22, #f39c12);
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 8px 30px rgba(90, 62, 43, 0.5);
-            transform: translateY(100px);
-            transition: transform 0.4s ease;
-            z-index: 1001;
-            display: none;
-        }
-
-        .install-banner.show {
-            transform: translateY(0);
-            display: block;
-        }
-
-        .install-banner-text {
-            color: #fff;
             font-size: 0.9em;
-            margin-bottom: 10px;
-        }
 
-        .install-banner-buttons {
+            margin-bottom: 10px;        @keyframes pulse {
+
+        }            0%, 100% { box-shadow: 0 8px 30px rgba(90, 62, 43, 0.5); }
+
+            50% { box-shadow: 0 8px 40px rgba(230, 126, 34, 0.8); }
+
+        .install-banner-buttons {        }
+
             display: flex;
-            gap: 10px;
-        }
 
-        .install-btn, .dismiss-btn {
-            flex: 1;
-            padding: 8px 16px;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.85em;
+            gap: 10px;        .achievement-title {
+
+        }            font-size: 1.1em;
+
             font-weight: bold;
-            transition: all 0.2s ease;
+
+        .install-btn, .dismiss-btn {            margin-bottom: 5px;
+
+            flex: 1;            color: #fff;
+
+            padding: 8px 16px;        }
+
+            border: 2px solid rgba(255, 255, 255, 0.5);
+
+            border-radius: 5px;        .achievement-text {
+
+            cursor: pointer;            font-size: 0.85em;
+
+            font-size: 0.85em;            color: #fff;
+
+            font-weight: bold;            margin-bottom: 10px;
+
+            transition: all 0.2s ease;        }
+
             touch-action: manipulation;
-            text-align: center;
-        }
 
-        .install-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-        }
+            text-align: center;        .notification-close {
 
-        .dismiss-btn {
-            background: transparent;
-            color: #fff;
+        }            background: rgba(255, 255, 255, 0.2);
+
+            border: 2px solid rgba(255, 255, 255, 0.5);
+
+        .install-btn {            color: #fff;
+
+            background: rgba(255, 255, 255, 0.2);            padding: 8px 16px;
+
+            color: #fff;            border-radius: 5px;
+
+        }            cursor: pointer;
+
+            font-size: 0.85em;
+
+        .dismiss-btn {            font-weight: bold;
+
+            background: transparent;            margin-top: 10px;
+
+            color: #fff;            transition: all 0.2s ease;
+
+        }            touch-action: manipulation;
+
         }
 
         .install-btn:active, .dismiss-btn:active {
-            transform: scale(0.95);
-        }
-    </style>
-</head>
+
+            transform: scale(0.95);        .notification-close:active {
+
+        }            background: rgba(255, 255, 255, 0.3);
+
+    </style>            transform: scale(0.95);
+
+</head>        }
+
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>⚔️ WYD Quest Tracker ⚔️</h1>
-            <p>Acompanhe suas missões diárias</p>
+
+    <div class="container">        @keyframes celebration {
+
+        <div class="header">            0%, 100% { transform: scale(1); }
+
+            <h1>⚔️ WYD Quest Tracker ⚔️</h1>            50% { transform: scale(1.1); }
+
+            <p>Acompanhe suas missões diárias</p>        }
+
         </div>
 
-        <div class="stats-container">
-            <div class="stat-card">
+        .celebrating {
+
+        <div class="stats-container">            animation: celebration 0.5s ease;
+
+            <div class="stat-card">        }
+
                 <div class="stat-label">Streak Atual</div>
+
                 <div class="stat-value" id="streak">0</div>
+
                 <div class="stat-label" style="margin-top: 10px; font-size: 0.8em;">🔥 dias consecutivos</div>
-            </div>
+
+            </div>        .user-info {
+
+            display: flex;
+
+            <div class="stat-card">            align-items: center;
+
+                <div class="stat-label">Nível</div>            justify-content: center;
+
+                <div class="stat-value" id="level">1</div>            flex-wrap: wrap;
+
+                <div class="level-bar">            gap: 5px;
+
+                    <div class="level-progress" id="levelProgress" style="width: 0%"></div>        }
+
+                </div>
+
+            </div>            color: #bbb;
+
+        }
 
             <div class="stat-card">
-                <div class="stat-label">Nível</div>
-                <div class="stat-value" id="level">1</div>
-                <div class="level-bar">
-                    <div class="level-progress" id="levelProgress" style="width: 0%"></div>
+
+                <div class="stat-label">Próximo Nível</div>        /* Cloud sync indicator */
+
+                <div class="stat-value" id="nextLevel">1000</div>        .sync-indicator {
+
+                <div class="stat-label" style="margin-top: 10px; font-size: 0.8em;">⚡ XP restante</div>            display: inline-block;
+
+            </div>            animation: pulse 2s ease-in-out infinite;
+
+        }
+
+            <div class="stat-card">
+
+                <div class="stat-label">Total XP</div>        @keyframes pulse {
+
+                <div class="stat-value" id="totalXP">0</div>            0%, 100% { opacity: 0.6; }
+
+            </div>            50% { opacity: 1; }
+
+        </div>        }
+
+
+
+        <div class="quests-container" id="questList">        /* PWA Install Banner */
+
+            <!-- Quests serão carregadas dinamicamente -->        .install-banner {
+
+        </div>            position: fixed;
+
+            bottom: 20px;
+
+        <div class="reset-timer">            left: 20px;
+
+            <div>🕐 Próximo reset em: <span id="timeToReset">--:--</span></div>            right: 20px;
+
+        </div>            background: linear-gradient(135deg, #e67e22, #f39c12);
+
+            padding: 15px;
+
+        <!-- Install Banner -->            border-radius: 10px;
+
+        <div class="install-banner" id="installBanner">            box-shadow: 0 8px 30px rgba(90, 62, 43, 0.5);
+
+            <div class="install-banner-text">            transform: translateY(100px);
+
+                📱 Instale o WYD Quest Tracker como aplicativo!            transition: transform 0.4s ease;
+
+            </div>            z-index: 1001;
+
+            <div class="install-banner-buttons">            display: none;
+
+                <button class="install-btn" id="installBtn">Instalar</button>        }
+
+                <button class="dismiss-btn" id="dismissBtn">Agora não</button>
+
+            </div>        .install-banner.show {
+
+        </div>            transform: translateY(0);
+
+    </div>            display: block;
+
+        }
+
+    <script src="app.js"></script>
+
+    <script>        .install-banner-text {
+
+        // Register Service Worker            color: #fff;
+
+        if ('serviceWorker' in navigator) {            font-size: 0.9em;
+
+            window.addEventListener('load', () => {            margin-bottom: 10px;
+
+                navigator.serviceWorker.register('sw.js')        }
+
+                    .then((registration) => {
+
+                        console.log('SW registered: ', registration);        .install-banner-buttons {
+
+                    })            display: flex;
+
+                    .catch((registrationError) => {            gap: 10px;
+
+                        console.log('SW registration failed: ', registrationError);        }
+
+                    });
+
+            });        .install-btn, .dismiss-btn {
+
+        }            flex: 1;
+
+            padding: 8px 16px;
+
+        // PWA Install Prompt            border: 2px solid rgba(255, 255, 255, 0.5);
+
+        let deferredPrompt;            border-radius: 5px;
+
+        const installBanner = document.getElementById('installBanner');            cursor: pointer;
+
+        const installBtn = document.getElementById('installBtn');            font-size: 0.85em;
+
+        const dismissBtn = document.getElementById('dismissBtn');            font-weight: bold;
+
+            transition: all 0.2s ease;
+
+        window.addEventListener('beforeinstallprompt', (e) => {            touch-action: manipulation;
+
+            e.preventDefault();            text-align: center;
+
+            deferredPrompt = e;        }
+
+            
+
+            // Show install banner if not dismissed before        .install-btn {
+
+            if (!localStorage.getItem('installDismissed')) {            background: rgba(255, 255, 255, 0.2);
+
+                setTimeout(() => {            color: #fff;
+
+                    installBanner.classList.add('show');        }
+
+                }, 3000);
+
+            }        .dismiss-btn {
+
+        });            background: transparent;
+
+            color: #fff;
+
+        installBtn.addEventListener('click', async () => {        }
+
+            if (!deferredPrompt) return;
+
+                    .install-btn:active, .dismiss-btn:active {
+
+            deferredPrompt.prompt();            transform: scale(0.95);
+
+            const { outcome } = await deferredPrompt.userChoice;        }
+
+                </style>
+
+            if (outcome === 'accepted') {</head>
+
+                console.log('User accepted the install prompt');<body>
+
+            }    <div class="container">
+
+                    <div class="header">
+
+            deferredPrompt = null;            <h1>⚔️ WYD Quest Tracker ⚔️</h1>
+
+            installBanner.classList.remove('show');            <p>Acompanhe suas missões diárias</p>
+
+        });        </div>
+
+
+
+        dismissBtn.addEventListener('click', () => {        <div class="stats-container">
+
+            installBanner.classList.remove('show');            <div class="stat-card">
+
+            localStorage.setItem('installDismissed', 'true');                <div class="stat-label">Streak Atual</div>
+
+        });                <div class="stat-value" id="streak">0</div>
+
+                <div class="stat-label" style="margin-top: 10px; font-size: 0.8em;">🔥 dias consecutivos</div>
+
+        window.addEventListener('appinstalled', () => {            </div>
+
+            console.log('PWA was installed');
+
+            installBanner.classList.remove('show');            <div class="stat-card">
+
+        });                <div class="stat-label">Nível</div>
+
+    </script>                <div class="stat-value" id="level">1</div>
+
+</body>                <div class="level-bar">
+
+</html>                    <div class="level-progress" id="levelProgress" style="width: 0%"></div>
                 </div>
             </div>
 
