@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Google Sign-In Oficial - WYD Tracker</title>
+    
+    <!-- Meta tag oficial do Google (ESSENCIAL) -->
+    <meta name="google-signin-client_id" content="507473876859-o0urtsgjnetchqkqcf16ium53ejp1tts.apps.googleusercontent.com">
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .status {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .success { border-left: 4px solid #2ecc71; }
+        .error { border-left: 4px solid #e74c3c; }
+        .info { border-left: 4px solid #3498db; }
+        .warning { border-left: 4px solid #f39c12; }
+        button {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .test-section {
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        #userInfo {
+            background: rgba(46, 204, 113, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Teste Google Sign-In Oficial</h1>
+        <p>Implementação baseada na documentação oficial do Google</p>
+        
+        <div class="status info">
+            <h3>✅ Correções Implementadas</h3>
+            <ul>
+                <li>📋 <strong>Meta tag oficial</strong>: google-signin-client_id configurada</li>
+                <li>📚 <strong>Platform.js</strong>: Biblioteca oficial ao invés de api.js</li>
+                <li>🔧 <strong>Método gapi.auth2.init()</strong>: Inicialização correta</li>
+                <li>⚠️ <strong>Tratamento de erros</strong>: Mensagens específicas</li>
+                <li>🔄 <strong>Listeners automáticos</strong>: Estado sincronizado</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Teste de Funcionamento</h2>
+            
+            <div class="status" id="initStatus">
+                <strong>Status da Inicialização:</strong> <span id="initText">Aguardando teste...</span>
+            </div>
+            
+            <div class="status" id="authStatus">
+                <strong>Status da Autenticação:</strong> <span id="authText">Não testado</span>
+            </div>
+            
+            <div id="userInfo">
+                <h3>👤 Informações do Usuário</h3>
+                <div id="userDetails"></div>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <button onclick="testInitialization()">🔧 Testar Inicialização</button>
+                <button onclick="testSignIn()" id="signInBtn">🔐 Testar Login</button>
+                <button onclick="testSignOut()" id="signOutBtn" style="display:none;">🚪 Testar Logout</button>
+                <button onclick="showStatus()">📊 Mostrar Status</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Diagnóstico Técnico</h2>
+            <div id="diagnostics" class="status">
+                <div>Clique em "Mostrar Status" para diagnóstico completo</div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📚 Diferenças da Implementação Anterior</h2>
+            <div class="status warning">
+                <h3>🚫 Problemas da Versão Anterior:</h3>
+                <ul>
+                    <li>❌ Usava <code>api.js</code> ao invés de <code>platform.js</code></li>
+                    <li>❌ Faltava meta tag <code>google-signin-client_id</code></li>
+                    <li>❌ Inicialização complexa e propensa a erros</li>
+                    <li>❌ Tratamento inadequado de cookies/iframe</li>
+                </ul>
+            </div>
+            
+            <div class="status success">
+                <h3>✅ Melhorias da Nova Versão:</h3>
+                <ul>
+                    <li>✅ <strong>Platform.js oficial</strong> com async/defer</li>
+                    <li>✅ <strong>Meta tag configurada</strong> conforme documentação</li>
+                    <li>✅ <strong>Inicialização robusta</strong> com verificações</li>
+                    <li>✅ <strong>Listeners automáticos</strong> para mudanças de estado</li>
+                    <li>✅ <strong>Mensagens de erro específicas</strong></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔗 Links Úteis</h2>
+            <button onclick="window.open('index.html', '_blank')">🎮 Abrir App Principal</button>
+            <button onclick="window.open('https://developers.google.com/identity/sign-in/web/sign-in', '_blank')">📖 Documentação Oficial</button>
+        </div>
+    </div>
+
+    <!-- Script do Google Platform (método oficial) -->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    
+    <script>
+        let testAuth = null;
+        
+        function updateInitStatus(status, type = 'info') {
+            const initStatus = document.getElementById('initStatus');
+            const initText = document.getElementById('initText');
+            
+            initText.textContent = status;
+            initStatus.className = `status ${type}`;
+        }
+        
+        function updateAuthStatus(status, type = 'info') {
+            const authStatus = document.getElementById('authStatus');
+            const authText = document.getElementById('authText');
+            
+            authText.textContent = status;
+            authStatus.className = `status ${type}`;
+        }
+        
+        function testInitialization() {
+            updateInitStatus('🔄 Testando inicialização...', 'info');
+            
+            // Verificar se gapi está carregado
+            if (!window.gapi) {
+                updateInitStatus('❌ GAPI não carregado - verifique conexão', 'error');
+                return;
+            }
+            
+            updateInitStatus('📡 GAPI carregado - inicializando auth2...', 'info');
+            
+            try {
+                gapi.load('auth2', () => {
+                    gapi.auth2.init({
+                        client_id: '507473876859-o0urtsgjnetchqkqcf16ium53ejp1tts.apps.googleusercontent.com',
+                        scope: 'profile email'
+                    }).then(
+                        (authInstance) => {
+                            testAuth = authInstance;
+                            updateInitStatus('✅ Inicialização bem-sucedida!', 'success');
+                            updateAuthStatus('⚡ Pronto para login', 'success');
+                            
+                            // Configurar listeners
+                            authInstance.isSignedIn.listen(onSignInChange);
+                            
+                            // Verificar se já está logado
+                            if (authInstance.isSignedIn.get()) {
+                                onSignInChange(true);
+                            }
+                        },
+                        (error) => {
+                            updateInitStatus(`❌ Erro na inicialização: ${error.error || error}`, 'error');
+                            
+                            if (error.error === 'idpiframe_initialization_failed') {
+                                updateAuthStatus('🍪 Erro: Cookies de terceiros bloqueados', 'error');
+                            } else {
+                                updateAuthStatus(`❌ Erro: ${error.error || 'Desconhecido'}`, 'error');
+                            }
+                        }
+                    );
+                });
+            } catch (error) {
+                updateInitStatus(`❌ Erro crítico: ${error.message}`, 'error');
+            }
+        }
+        
+        function testSignIn() {
+            if (!testAuth) {
+                updateAuthStatus('⚠️ Execute primeiro a inicialização', 'warning');
+                return;
+            }
+            
+            updateAuthStatus('🔄 Tentando fazer login...', 'info');
+            
+            testAuth.signIn().then(
+                (googleUser) => {
+                    updateAuthStatus('✅ Login realizado com sucesso!', 'success');
+                    onSignInChange(true);
+                },
+                (error) => {
+                    updateAuthStatus(`❌ Erro no login: ${error.error || error}`, 'error');
+                }
+            );
+        }
+        
+        function testSignOut() {
+            if (!testAuth) {
+                return;
+            }
+            
+            testAuth.signOut().then(() => {
+                updateAuthStatus('👋 Logout realizado', 'info');
+                onSignInChange(false);
+            });
+        }
+        
+        function onSignInChange(isSignedIn) {
+            const signInBtn = document.getElementById('signInBtn');
+            const signOutBtn = document.getElementById('signOutBtn');
+            const userInfo = document.getElementById('userInfo');
+            const userDetails = document.getElementById('userDetails');
+            
+            if (isSignedIn) {
+                const user = testAuth.currentUser.get();
+                const profile = user.getBasicProfile();
+                
+                signInBtn.style.display = 'none';
+                signOutBtn.style.display = 'inline-block';
+                
+                userDetails.innerHTML = `
+                    <p><strong>Nome:</strong> ${profile.getName()}</p>
+                    <p><strong>Email:</strong> ${profile.getEmail()}</p>
+                    <p><strong>ID:</strong> ${profile.getId()}</p>
+                    <p><strong>Foto:</strong> <img src="${profile.getImageUrl()}" style="width: 32px; height: 32px; border-radius: 50%; vertical-align: middle; margin-left: 10px;"></p>
+                `;
+                userInfo.style.display = 'block';
+                
+            } else {
+                signInBtn.style.display = 'inline-block';
+                signOutBtn.style.display = 'none';
+                userInfo.style.display = 'none';
+            }
+        }
+        
+        function showStatus() {
+            const diagnostics = document.getElementById('diagnostics');
+            
+            const gapiLoaded = !!window.gapi;
+            const authInitialized = !!testAuth;
+            const isSignedIn = testAuth ? testAuth.isSignedIn.get() : false;
+            const currentUser = isSignedIn ? testAuth.currentUser.get().getBasicProfile().getName() : 'Nenhum';
+            
+            diagnostics.innerHTML = `
+                <h3>📊 Status Completo</h3>
+                <p><strong>GAPI Carregado:</strong> ${gapiLoaded ? '✅ Sim' : '❌ Não'}</p>
+                <p><strong>Auth2 Inicializado:</strong> ${authInitialized ? '✅ Sim' : '❌ Não'}</p>
+                <p><strong>Usuário Logado:</strong> ${isSignedIn ? '✅ Sim' : '❌ Não'}</p>
+                <p><strong>Usuário Atual:</strong> ${currentUser}</p>
+                <p><strong>URL Atual:</strong> ${window.location.href}</p>
+                <p><strong>User Agent:</strong> ${navigator.userAgent.substring(0, 100)}...</p>
+                <p><strong>Cookies Habilitados:</strong> ${navigator.cookieEnabled ? '✅ Sim' : '❌ Não'}</p>
+                <p><strong>LocalStorage:</strong> ${typeof(Storage) !== "undefined" ? '✅ Disponível' : '❌ Não disponível'}</p>
+            `;
+        }
+        
+        // Auto-inicializar quando GAPI estiver carregado
+        function onGapiLoad() {
+            updateInitStatus('📡 Platform.js carregado - clique em "Testar Inicialização"', 'info');
+        }
+        
+        // Aguardar GAPI carregar
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (window.gapi) {
+                    onGapiLoad();
+                } else {
+                    updateInitStatus('⏳ Aguardando Google Platform.js...', 'warning');
+                    // Tentar novamente em intervalos
+                    const checkGapi = setInterval(() => {
+                        if (window.gapi) {
+                            clearInterval(checkGapi);
+                            onGapiLoad();
+                        }
+                    }, 500);
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

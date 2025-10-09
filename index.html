@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WYD Quest Tracker</title>
     
+    <!-- Google Sign-In Meta Tag (Oficial) -->
+    <meta name="google-signin-client_id" content="507473876859-o0urtsgjnetchqkqcf16ium53ejp1tts.apps.googleusercontent.com">
+    
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#8b5a2b">
     <meta name="description" content="Acompanhe suas missões diárias do WYD">
@@ -485,6 +488,44 @@
             transform: translateY(0);
         }
 
+        .sync-btn {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+            box-shadow: 0 2px 10px rgba(155, 89, 182, 0.3);
+        }
+
+        .sync-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);
+        }
+
+        .sync-btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 480px) {
+            .login-section {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+            
+            .login-btn, .sync-btn {
+                width: 100%;
+                max-width: 200px;
+                margin: 0;
+            }
+        }
+
         .user-info {
             display: flex;
             align-items: center;
@@ -578,6 +619,10 @@
             <!-- Login Section -->
             <div class="login-section" style="margin-top: 15px;">
                 <button id="loginBtn" class="login-btn">🔐 Login Google</button>
+                <button id="syncBtn" class="sync-btn" onclick="simpleSyncManager.showSyncModal()" 
+                        style="background: linear-gradient(135deg, #9b59b6, #8e44ad); margin-left: 10px;">
+                    🔄 Sincronizar
+                </button>
                 <div id="userInfo" class="user-info" style="display: none; margin-top: 8px; font-size: 0.85em; color: #6b4423;"></div>
             </div>
             
@@ -733,8 +778,8 @@
         </div>
     </div>
 
-    <script src="cookie-manager.js"></script>
-    <script src="cloud-sync.js"></script>
+    <script src="simple-sync.js"></script>
+    <script src="modern-google-auth.js"></script>
     <script src="app.js"></script>
     <script>
         // Register Service Worker

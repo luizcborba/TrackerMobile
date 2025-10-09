@@ -176,8 +176,9 @@ function saveData() {
     localStorage.setItem('wydQuestData', JSON.stringify(data));
     
     // Sincronizar com a nuvem se usuário estiver logado
-    if (window.cloudSync && cloudSync.isSignedIn) {
-        cloudSync.syncToCloud();
+    if (window.modernGoogleAuth && modernGoogleAuth.isSignedIn) {
+        // TODO: Implementar sincronização com Google quando necessário
+        console.log('📊 Dados salvos - usuário logado no Google');
     }
 }
 
@@ -438,3 +439,10 @@ if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.p
         console.log('Background sync não disponível:', err);
     });
 }
+
+// Inicializar Google Auth após a página carregar
+setTimeout(() => {
+    if (window.modernGoogleAuth) {
+        modernGoogleAuth.init();
+    }
+}, 1000);
