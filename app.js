@@ -6,7 +6,6 @@ const data = {
     totalXP: 0,
     level: 1,
     lastCompletedDate: null,
-    theme: 'default',
     notifiedQuests: {},
     lastSync: null,
     notificationInterval: null
@@ -59,9 +58,6 @@ function initializeApp() {
     
     // Atualizar timer a cada minuto
     setInterval(updateTimeToReset, 60000);
-    
-    // Configurar tema
-    applyTheme();
     
     // Inicializar notificações
     initializeNotifications();
@@ -307,22 +303,6 @@ function getCategoryName(category) {
         'guild': 'Guild'
     };
     return names[category] || category;
-}
-
-// Alternar tema
-function toggleTheme() {
-    data.theme = data.theme === 'default' ? 'dark' : 'default';
-    applyTheme();
-    saveData();
-}
-
-// Aplicar tema
-function applyTheme() {
-    if (data.theme === 'dark') {
-        document.body.classList.add('dark-theme');
-    } else {
-        document.body.classList.remove('dark-theme');
-    }
 }
 
 // Atualizar tempo para reset

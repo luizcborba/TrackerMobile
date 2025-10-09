@@ -9,7 +9,7 @@ Aplicativo para acompanhar suas missões diárias do WYD.
 - 📊 **Sistema de XP e níveis**
 - 🌅 **Reset diário automático**
 - 📱 **PWA** - instala no celular
-- 🌓 **Tema escuro/claro**
+- 🌓 **Tema escuro** permanente
 - 💾 **Armazenamento local** automático
 
 ## 🕐 Horários de Notificação
