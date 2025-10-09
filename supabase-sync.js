@@ -1,6 +1,6 @@
 // Configuração do Supabase
-const SUPABASE_URL = 'https://your-project.supabase.co'; // Você precisará substituir pela sua URL
-const SUPABASE_KEY = 'your-anon-key'; // Você precisará substituir pela sua chave
+const SUPABASE_URL = 'https://qhmgdguuxmnzpousatrn.supabase.co'; // Você precisará substituir pela sua URL
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFobWdkZ3V1eG1uenBvdXNhdHJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5NjA4MDMsImV4cCI6MjA3NTUzNjgwM30.AIdD2iVHQi_nOqiCxybHlaDNW6M9Q2LCTB7v2is-RlY'; // Você precisará substituir pela sua chave
 
 class SupabaseSync {
     constructor() {
