@@ -188,12 +188,18 @@ class SupabaseSync {
     }
 
     updateUI() {
+        console.log('🔄 Atualizando UI - usuário:', this.user?.email || 'Nenhum');
+        
         const loginBtn = document.getElementById('loginBtn');
         const userInfo = document.getElementById('userInfo');
 
-        if (!loginBtn) return;
+        if (!loginBtn) {
+            console.log('❌ Elemento loginBtn não encontrado');
+            return;
+        }
 
         if (this.user) {
+            console.log('✅ Usuário logado, atualizando UI para estado logado');
             // Usuário logado
             loginBtn.textContent = '🚪 Logout';
             loginBtn.onclick = () => this.signOut();
@@ -201,7 +207,10 @@ class SupabaseSync {
 
             if (userInfo) {
                 const avatar = this.user.user_metadata.avatar_url || '';
-                const name = this.user.user_metadata.name || this.user.email;
+                const name = this.user.user_metadata.full_name || this.user.user_metadata.name || this.user.email;
+                
+                console.log('📷 Avatar:', avatar);
+                console.log('👤 Nome:', name);
                 
                 userInfo.innerHTML = `
                     ${avatar ? `<img src="${avatar}" alt="Avatar" style="width: 20px; height: 20px; border-radius: 50%; margin-right: 5px; vertical-align: middle;">` : ''}
@@ -209,9 +218,13 @@ class SupabaseSync {
                     <span style="font-size: 0.7em; color: #2ecc71;">☁️ Nuvem</span>
                 `;
                 userInfo.style.display = 'block';
+                console.log('✅ UserInfo atualizado e exibido');
+            } else {
+                console.log('❌ Elemento userInfo não encontrado');
             }
 
         } else {
+            console.log('⚪ Usuário não logado, atualizando UI para estado deslogado');
             // Usuário não logado
             loginBtn.textContent = '🔐 Login Google';
             loginBtn.onclick = () => this.signInWithGoogle();
