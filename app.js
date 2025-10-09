@@ -6,7 +6,6 @@ const data = {
     totalXP: 0,
     level: 1,
     lastCompletedDate: null,
-    theme: 'dark',
     notifiedQuests: {},
     lastSync: null,
     notificationInterval: null
@@ -48,9 +47,6 @@ function initializeApp() {
     loadData();
     updateUI();
     updateTimeToReset();
-    
-    // Forçar tema escuro
-    document.body.classList.add('dark-theme');
     
     // Verificar se precisa resetar as quests
     const lastResetDate = data.lastResetDate || '';
