@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Teste Supabase + Google Auth</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+        }
+        
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        
+        .test-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .test-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .success { color: #2ecc71; }
+        .error { color: #e74c3c; }
+        .warning { color: #f39c12; }
+        
+        .logs {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste Supabase + Google Auth</h1>
+        
+        <div class="status-card">
+            <h3>📊 Status do Sistema</h3>
+            <div id="systemStatus">Carregando...</div>
+        </div>
+        
+        <div class="status-card">
+            <h3>👤 Status do Usuário</h3>
+            <div id="userStatus">Não logado</div>
+        </div>
+        
+        <div class="status-card">
+            <h3>🧪 Testes Disponíveis</h3>
+            <button class="test-btn" onclick="testSupabaseConnection()">
+                🔗 Testar Conexão Supabase
+            </button>
+            <button class="test-btn" onclick="testGoogleLogin()">
+                🔐 Testar Login Google
+            </button>
+            <button class="test-btn" onclick="testDataUpload()">
+                ⬆️ Testar Upload de Dados
+            </button>
+            <button class="test-btn" onclick="testDataDownload()">
+                ⬇️ Testar Download de Dados
+            </button>
+            <button class="test-btn" onclick="testLogout()">
+                🚪 Testar Logout
+            </button>
+        </div>
+        
+        <div class="status-card">
+            <h3>📝 Logs</h3>
+            <button class="test-btn" onclick="clearLogs()" style="float: right; padding: 5px 10px;">
+                🗑️ Limpar
+            </button>
+            <div id="logs" class="logs">
+                [Carregando sistema...]<br>
+            </div>
+        </div>
+        
+        <div class="status-card">
+            <h3>⚙️ Configuração Necessária</h3>
+            <p>Para funcionar corretamente, você precisa:</p>
+            <ul>
+                <li>✅ Criar projeto no Supabase</li>
+                <li>✅ Configurar Google OAuth</li>
+                <li>✅ Atualizar URLs em supabase-sync.js</li>
+                <li>✅ Configurar tabela game_data</li>
+            </ul>
+            <p><strong>Veja o arquivo SETUP_SUPABASE.md para instruções completas!</strong></p>
+        </div>
+    </div>
+
+    <script src="supabase-sync.js"></script>
+    <script>
+        // Mock data para testes
+        const data = {
+            quests: { checkin: true, spoils: false },
+            totalXP: 1250,
+            level: 2,
+            streak: 5,
+            lastSync: new Date().toISOString()
+        };
+
+        function showAchievement(message) {
+            log(message);
+        }
+
+        function saveData() {
+            localStorage.setItem('wydQuestData', JSON.stringify(data));
+            log('💾 Dados salvos localmente');
+        }
+
+        function updateUI() {
+            log('🔄 UI atualizada');
+        }
+
+        function log(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#e74c3c' : type === 'success' ? '#2ecc71' : type === 'warning' ? '#f39c12' : '#3498db';
+            
+            logs.innerHTML += `<span style="color: ${color}">[${timestamp}] ${message}</span><br>`;
+            logs.scrollTop = logs.scrollHeight;
+            
+            console.log(message);
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+        }
+
+        function updateStatus() {
+            const systemStatus = document.getElementById('systemStatus');
+            const userStatus = document.getElementById('userStatus');
+            
+            if (window.supabaseSync) {
+                const status = supabaseSync.getStatus();
+                
+                systemStatus.innerHTML = `
+                    <div class="${status.isInitialized ? 'success' : 'error'}">
+                        Supabase: ${status.isInitialized ? '✅ Conectado' : '❌ Desconectado'}
+                    </div>
+                    <div class="${status.hasSupabase ? 'success' : 'error'}">
+                        Cliente: ${status.hasSupabase ? '✅ Carregado' : '❌ Não carregado'}
+                    </div>
+                `;
+                
+                if (status.user) {
+                    userStatus.innerHTML = `
+                        <div class="success">✅ Logado como: ${status.user.user_metadata.name || status.user.email}</div>
+                        <div>ID: ${status.user.id}</div>
+                        <div>Email: ${status.user.email}</div>
+                    `;
+                } else {
+                    userStatus.innerHTML = '<div class="warning">⚠️ Não logado</div>';
+                }
+            } else {
+                systemStatus.innerHTML = '<div class="error">❌ supabaseSync não carregado</div>';
+                userStatus.innerHTML = '<div class="error">❌ Sistema não disponível</div>';
+            }
+        }
+
+        // Testes
+        async function testSupabaseConnection() {
+            log('🔗 Testando conexão com Supabase...', 'info');
+            
+            if (!window.supabaseSync) {
+                log('❌ supabaseSync não está disponível', 'error');
+                return;
+            }
+            
+            try {
+                const result = await supabaseSync.init();
+                if (result) {
+                    log('✅ Conexão com Supabase estabelecida!', 'success');
+                } else {
+                    log('❌ Falha ao conectar com Supabase', 'error');
+                }
+            } catch (error) {
+                log(`❌ Erro na conexão: ${error.message}`, 'error');
+            }
+            
+            updateStatus();
+        }
+
+        async function testGoogleLogin() {
+            log('🔐 Iniciando teste de login Google...', 'info');
+            
+            if (!window.supabaseSync) {
+                log('❌ supabaseSync não disponível', 'error');
+                return;
+            }
+            
+            try {
+                await supabaseSync.signInWithGoogle();
+                log('🔄 Redirecionando para Google OAuth...', 'info');
+            } catch (error) {
+                log(`❌ Erro no login: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDataUpload() {
+            log('⬆️ Testando upload de dados...', 'info');
+            
+            if (!window.supabaseSync) {
+                log('❌ supabaseSync não disponível', 'error');
+                return;
+            }
+            
+            const status = supabaseSync.getStatus();
+            if (!status.isLoggedIn) {
+                log('⚠️ Precisa estar logado para fazer upload', 'warning');
+                return;
+            }
+            
+            try {
+                await supabaseSync.uploadData();
+                log('✅ Upload de dados concluído!', 'success');
+            } catch (error) {
+                log(`❌ Erro no upload: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDataDownload() {
+            log('⬇️ Testando download de dados...', 'info');
+            
+            if (!window.supabaseSync) {
+                log('❌ supabaseSync não disponível', 'error');
+                return;
+            }
+            
+            const status = supabaseSync.getStatus();
+            if (!status.isLoggedIn) {
+                log('⚠️ Precisa estar logado para fazer download', 'warning');
+                return;
+            }
+            
+            try {
+                await supabaseSync.downloadData();
+                log('✅ Download de dados concluído!', 'success');
+            } catch (error) {
+                log(`❌ Erro no download: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLogout() {
+            log('🚪 Testando logout...', 'info');
+            
+            if (!window.supabaseSync) {
+                log('❌ supabaseSync não disponível', 'error');
+                return;
+            }
+            
+            try {
+                await supabaseSync.signOut();
+                log('✅ Logout realizado!', 'success');
+                updateStatus();
+            } catch (error) {
+                log(`❌ Erro no logout: ${error.message}`, 'error');
+            }
+        }
+
+        // Inicialização
+        window.addEventListener('load', async () => {
+            log('🚀 Página carregada, inicializando testes...', 'info');
+            
+            // Aguardar um pouco para garantir que tudo carregou
+            setTimeout(async () => {
+                if (window.supabaseSync) {
+                    log('📦 supabaseSync detectado, inicializando...', 'info');
+                    try {
+                        await supabaseSync.init();
+                        log('✅ Sistema inicializado com sucesso!', 'success');
+                    } catch (error) {
+                        log(`❌ Erro na inicialização: ${error.message}`, 'error');
+                    }
+                } else {
+                    log('❌ supabaseSync não foi carregado', 'error');
+                }
+                
+                updateStatus();
+            }, 1000);
+        });
+
+        // Atualizar status periodicamente
+        setInterval(updateStatus, 5000);
+    </script>
+</body>
+</html>
