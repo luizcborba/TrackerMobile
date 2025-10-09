@@ -70,6 +70,8 @@
         <div style="text-align: center; margin-top: 30px;">
             <button onclick="testGoogleAuth()">🧪 Testar Google Auth</button>
             <button onclick="showDebugInfo()">🐛 Info Debug</button>
+            <button onclick="testClientId()">🔑 Testar Client ID</button>
+            <button onclick="testAlternativeAuth()">🔄 Método Alternativo</button>
         </div>
         
         <div id="logs" class="status" style="max-height: 300px; overflow-y: auto;">
@@ -157,10 +159,22 @@
                     gapi.load('auth2', async () => {
                         try {
                             log('Inicializando Google Auth2...');
-                            gauth = await gapi.auth2.init({
-                                client_id: CLIENT_ID,
-                                scope: 'profile email'
-                            });
+                            log(`Client ID: ${CLIENT_ID}`);
+                            log(`URL atual: ${window.location.href}`);
+                            
+                            // Verificar se já existe uma instância
+                            if (gapi.auth2.getAuthInstance()) {
+                                log('Instância Auth2 já existe, usando existente...');
+                                gauth = gapi.auth2.getAuthInstance();
+                            } else {
+                                log('Criando nova instância Auth2...');
+                                gauth = await gapi.auth2.init({
+                                    client_id: CLIENT_ID,
+                                    scope: 'profile email',
+                                    fetch_basic_profile: true,
+                                    ux_mode: 'popup'
+                                });
+                            }
                             
                             log('Google Auth2 inicializado ✅', 'success');
                             authDetails.innerHTML = '✅ Google Auth inicializado';
@@ -178,8 +192,24 @@
                             
                             resolve();
                         } catch (error) {
-                            log(`Erro ao inicializar Auth2: ${error.message}`, 'error');
-                            authDetails.innerHTML = `❌ Erro: ${error.message}`;
+                            log(`Erro ao inicializar Auth2: ${error}`, 'error');
+                            log(`Tipo do erro: ${typeof error}`, 'error');
+                            log(`Error.message: ${error?.message || 'N/A'}`, 'error');
+                            log(`Error.details: ${error?.details || 'N/A'}`, 'error');
+                            log(`Error.error: ${error?.error || 'N/A'}`, 'error');
+                            log(`Error completo: ${JSON.stringify(error, null, 2)}`, 'error');
+                            
+                            // Verificar possíveis problemas
+                            if (error && error.error === 'idpiframe_initialization_failed') {
+                                log('DIAGNÓSTICO: Problema com iframe do Google - possível bloqueio de cookies', 'error');
+                            } else if (error && error.error === 'popup_closed_by_user') {
+                                log('DIAGNÓSTICO: Popup fechado pelo usuário', 'error');
+                            } else if (!error || error === undefined) {
+                                log('DIAGNÓSTICO: Erro undefined - possível problema de configuração no Google Console', 'error');
+                                log('Verifique: 1) Client ID correto, 2) Domain autorizado, 3) Redirect URIs', 'error');
+                            }
+                            
+                            authDetails.innerHTML = `❌ Erro: ${error?.message || error?.error || 'undefined - verifique configuração Google Console'}`;
                             authDetails.parentElement.className = 'status error';
                             reject(error);
                         }
@@ -214,10 +244,13 @@
         function showDebugInfo() {
             log('=== DEBUG INFO ===');
             log(`Client ID: ${CLIENT_ID}`);
+            log(`Client ID length: ${CLIENT_ID.length}`);
+            log(`Client ID válido: ${CLIENT_ID.endsWith('.apps.googleusercontent.com') ? 'SIM' : 'NÃO'}`);
             log(`User Agent: ${navigator.userAgent}`);
             log(`Cookies habilitados: ${navigator.cookieEnabled}`);
             log(`Local Storage: ${typeof(Storage) !== "undefined" ? 'Disponível' : 'Não disponível'}`);
             log(`Referrer: ${document.referrer || 'Nenhum'}`);
+            log(`Third-party cookies: ${document.cookie ? 'Permitidos' : 'Bloqueados/Vazios'}`);
             
             // Testar URLs esperadas
             const expectedURLs = [
@@ -232,6 +265,86 @@
             });
             
             log(`URL atual: ${window.location.href}`);
+            
+            // Verificar domínio autorizado
+            const currentDomain = `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}`;
+            log(`Domínio atual: ${currentDomain}`);
+            
+            // Verificar se gapi está carregado
+            log(`GAPI carregado: ${typeof gapi !== 'undefined' ? 'SIM' : 'NÃO'}`);
+            if (typeof gapi !== 'undefined') {
+                log(`GAPI auth2 disponível: ${typeof gapi.auth2 !== 'undefined' ? 'SIM' : 'NÃO'}`);
+            }
+        }
+        
+        function testClientId() {
+            log('=== TESTE CLIENT ID ===');
+            log(`Client ID: ${CLIENT_ID}`);
+            
+            // Verificações básicas
+            const validFormat = CLIENT_ID.match(/^\d+-[a-z0-9]+\.apps\.googleusercontent\.com$/);
+            log(`Formato válido: ${validFormat ? 'SIM ✅' : 'NÃO ❌'}`);
+            
+            const correctLength = CLIENT_ID.length > 50 && CLIENT_ID.length < 100;
+            log(`Tamanho adequado: ${correctLength ? 'SIM ✅' : 'NÃO ❌'}`);
+            
+            // Teste de conectividade com Google
+            log('Testando conectividade com Google APIs...');
+            fetch('https://accounts.google.com/.well-known/openid_configuration')
+                .then(response => {
+                    if (response.ok) {
+                        log('Conectividade Google: OK ✅', 'success');
+                    } else {
+                        log('Conectividade Google: ERRO ❌', 'error');
+                    }
+                })
+                .catch(error => {
+                    log(`Conectividade Google: ERRO ❌ - ${error.message}`, 'error');
+                });
+        }
+        
+        function testAlternativeAuth() {
+            log('=== MÉTODO ALTERNATIVO ===');
+            
+            // Tentar com configuração mais específica
+            loadGoogleAPI().then(() => {
+                gapi.load('auth2', () => {
+                    log('Tentando inicialização com configuração alternativa...');
+                    
+                    const authInstance = gapi.auth2.init({
+                        client_id: CLIENT_ID,
+                        scope: 'openid profile email',
+                        fetch_basic_profile: true,
+                        ux_mode: 'popup',
+                        hosted_domain: undefined,
+                        plugin_name: 'WYD_Quest_Tracker'
+                    });
+                    
+                    authInstance.then(
+                        (auth) => {
+                            log('Auth alternativo inicializado ✅', 'success');
+                            log(`Usuário logado: ${auth.isSignedIn.get()}`);
+                            
+                            if (!auth.isSignedIn.get()) {
+                                log('Tentando login...');
+                                auth.signIn().then(
+                                    (user) => {
+                                        const profile = user.getBasicProfile();
+                                        log(`Login sucesso ✅: ${profile.getName()}`, 'success');
+                                    },
+                                    (error) => {
+                                        log(`Login falhou ❌: ${error.error || error}`, 'error');
+                                    }
+                                );
+                            }
+                        },
+                        (error) => {
+                            log(`Auth alternativo falhou ❌: ${error.error || error}`, 'error');
+                            log(`Detalhes: ${JSON.stringify(error, null, 2)}`);
+                        }
+                    );
+                });
+            });
         }
         
         // Inicializar
