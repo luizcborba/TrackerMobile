@@ -18,9 +18,10 @@ class CloudSync {
                 this.auth = gapi.auth2.init({
                     client_id: this.clientId,
                     scope: 'profile email',
-                    // Configurações extras para desenvolvimento
+                    // Configurações extras para compatibilidade
                     hosted_domain: null,
-                    fetch_basic_profile: true
+                    fetch_basic_profile: true,
+                    ux_mode: 'popup' // Usar popup ao invés de redirect
                 });
                 
                 this.auth.isSignedIn.listen(this.onSignInChange.bind(this));
@@ -99,7 +100,16 @@ class CloudSync {
             await this.auth.signIn();
         } catch (error) {
             console.log('Erro no login:', error);
-            showAchievement('❌ Erro no login. Verifique se está em HTTPS ou localhost.');
+            
+            if (error.error === 'popup_blocked_by_browser') {
+                showAchievement('❌ Popup bloqueado! Permita popups e tente novamente.');
+            } else if (error.error === 'access_denied') {
+                showAchievement('❌ Acesso negado. Tente novamente.');
+            } else if (error.error === 'redirect_uri_mismatch') {
+                showAchievement('❌ Erro de configuração. Verifique as URLs no Google Console.');
+            } else {
+                showAchievement('❌ Erro no login. Verifique se está em HTTPS ou localhost.');
+            }
         }
     }
 
