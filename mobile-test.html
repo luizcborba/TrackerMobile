@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Mobile - WYD Tracker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 10px;
+            min-height: 100vh;
+            color: white;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .status {
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+        .success { border-left: 4px solid #2ecc71; }
+        .error { border-left: 4px solid #e74c3c; }
+        .info { border-left: 4px solid #3498db; }
+        button {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px 2px;
+            width: 100%;
+            touch-action: manipulation;
+        }
+        button:hover, button:active {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        @media (max-width: 480px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Teste Mobile - Google Auth</h1>
+        <p>Diagnóstico específico para dispositivos móveis</p>
+        
+        <div id="environment" class="status info">
+            <h3>📍 Detecção de Ambiente</h3>
+            <div id="envDetails"></div>
+        </div>
+        
+        <div id="mobileInfo" class="status">
+            <h3>📱 Informações Mobile</h3>
+            <div id="mobileDetails"></div>
+        </div>
+        
+        <div id="authStatus" class="status">
+            <h3>🔐 Status Google Auth</h3>
+            <div id="authDetails">Aguardando teste...</div>
+        </div>
+        
+        <div class="grid">
+            <button onclick="testMobileAuth()">🧪 Teste Auth</button>
+            <button onclick="testMobileFeatures()">📱 Teste Mobile</button>
+            <button onclick="showDebugInfo()">🐛 Debug</button>
+            <button onclick="clearLogs()">🗑️ Limpar</button>
+        </div>
+        
+        <div id="logs" class="status" style="max-height: 200px; overflow-y: auto;">
+            <h3>📝 Logs Mobile</h3>
+            <div id="logContent"></div>
+        </div>
+    </div>
+
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script>
+        const CLIENT_ID = '507473876859-o0urtsgjnetchqkqcf16ium53ejp1tts.apps.googleusercontent.com';
+        let gauth = null;
+        
+        function log(message, type = 'info') {
+            const logContent = document.getElementById('logContent');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+            logEntry.style.color = type === 'error' ? '#e74c3c' : type === 'success' ? '#2ecc71' : '#ecf0f1';
+            logEntry.style.fontSize = '11px';
+            logEntry.style.marginBottom = '3px';
+            logContent.appendChild(logEntry);
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+        
+        function detectMobile() {
+            const userAgent = navigator.userAgent;
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+            const isTablet = /iPad|Android(?=.*Mobile)/i.test(userAgent);
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const screenWidth = window.screen.width;
+            const screenHeight = window.screen.height;
+            
+            return {
+                isMobile,
+                isTablet,
+                isTouchDevice,
+                screenWidth,
+                screenHeight,
+                userAgent: userAgent.substring(0, 100) + '...',
+                orientation: screen.orientation ? screen.orientation.type : 'N/A'
+            };
+        }
+        
+        function updateEnvironment() {
+            const envDetails = document.getElementById('envDetails');
+            const mobileDetails = document.getElementById('mobileDetails');
+            
+            // Informações de ambiente
+            const protocol = window.location.protocol;
+            const hostname = window.location.hostname;
+            const url = window.location.href;
+            
+            const isHTTPS = protocol === 'https:';
+            const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+            const isGitHubPages = hostname === 'luizcborba.github.io';
+            const shouldUseAuth = isHTTPS || isLocalhost;
+            
+            envDetails.innerHTML = `
+                <strong>URL:</strong> ${url.substring(0, 60)}...<br>
+                <strong>Protocol:</strong> ${protocol} ${isHTTPS ? '✅' : '❌'}<br>
+                <strong>Hostname:</strong> ${hostname}<br>
+                <strong>GitHub Pages:</strong> ${isGitHubPages ? '✅' : '❌'}<br>
+                <strong>Deve usar Auth:</strong> ${shouldUseAuth ? '✅ SIM' : '❌ NÃO'}
+            `;
+            
+            // Informações mobile
+            const mobile = detectMobile();
+            mobileDetails.innerHTML = `
+                <strong>Mobile:</strong> ${mobile.isMobile ? '✅ SIM' : '❌ NÃO'}<br>
+                <strong>Tablet:</strong> ${mobile.isTablet ? '✅ SIM' : '❌ NÃO'}<br>
+                <strong>Touch:</strong> ${mobile.isTouchDevice ? '✅ SIM' : '❌ NÃO'}<br>
+                <strong>Tela:</strong> ${mobile.screenWidth}x${mobile.screenHeight}<br>
+                <strong>Orientação:</strong> ${mobile.orientation}<br>
+                <strong>User Agent:</strong> ${mobile.userAgent}
+            `;
+            
+            mobileDetails.parentElement.className = `status ${mobile.isMobile ? 'success' : 'info'}`;
+            
+            log(`Ambiente detectado: ${protocol}//${hostname}`);
+            log(`Mobile: ${mobile.isMobile}, Touch: ${mobile.isTouchDevice}`);
+            log(`Auth deve funcionar: ${shouldUseAuth}`);
+        }
+        
+        async function testMobileAuth() {
+            const authDetails = document.getElementById('authDetails');
+            
+            try {
+                log('🧪 Iniciando teste de autenticação mobile...');
+                
+                // Verificar ambiente
+                const isHTTPS = window.location.protocol === 'https:';
+                const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                
+                if (!isHTTPS && !isLocalhost) {
+                    log('❌ Ambiente HTTP detectado - Google Auth não funciona', 'error');
+                    authDetails.innerHTML = '❌ HTTP detectado - Google Auth requer HTTPS';
+                    authDetails.parentElement.className = 'status error';
+                    return;
+                }
+                
+                log('✅ Ambiente HTTPS/localhost - prosseguindo...');
+                
+                // Carregar e inicializar
+                await new Promise((resolve, reject) => {
+                    gapi.load('auth2', async () => {
+                        try {
+                            log('Inicializando Google Auth para mobile...');
+                            
+                            gauth = await gapi.auth2.init({
+                                client_id: CLIENT_ID,
+                                scope: 'profile email',
+                                fetch_basic_profile: true,
+                                ux_mode: 'popup' // Importante para mobile
+                            });
+                            
+                            log('✅ Google Auth inicializado!', 'success');
+                            authDetails.innerHTML = '✅ Google Auth pronto para mobile';
+                            authDetails.parentElement.className = 'status success';
+                            
+                            // Tentar login
+                            log('Tentando login mobile...');
+                            const user = await gauth.signIn();
+                            const profile = user.getBasicProfile();
+                            
+                            log(`✅ Login mobile realizado: ${profile.getName()}`, 'success');
+                            authDetails.innerHTML = `✅ Login mobile OK!<br>👤 ${profile.getName()}`;
+                            
+                            resolve();
+                        } catch (error) {
+                            log(`❌ Erro mobile: ${error.error || error}`, 'error');
+                            authDetails.innerHTML = `❌ Erro mobile: ${error.error || 'Desconhecido'}`;
+                            authDetails.parentElement.className = 'status error';
+                            reject(error);
+                        }
+                    });
+                });
+                
+            } catch (error) {
+                log(`❌ Erro geral: ${error.message || error}`, 'error');
+            }
+        }
+        
+        function testMobileFeatures() {
+            log('🔍 Testando recursos mobile...');
+            
+            // Teste de touch
+            log(`Touch events: ${('ontouchstart' in window) ? 'Suportados ✅' : 'Não suportados ❌'}`);
+            
+            // Teste de orientação
+            if (screen.orientation) {
+                log(`Orientação: ${screen.orientation.type} ✅`);
+            } else {
+                log('API de orientação: Não suportada ❌');
+            }
+            
+            // Teste de vibração
+            if (navigator.vibrate) {
+                log('Vibração: Suportada ✅');
+                navigator.vibrate(100); // Vibrar brevemente
+            } else {
+                log('Vibração: Não suportada ❌');
+            }
+            
+            // Teste de service worker
+            if ('serviceWorker' in navigator) {
+                log('Service Worker: Suportado ✅');
+            } else {
+                log('Service Worker: Não suportado ❌');
+            }
+            
+            // Teste de notificações
+            if ('Notification' in window) {
+                log(`Notificações: ${Notification.permission} ✅`);
+            } else {
+                log('Notificações: Não suportadas ❌');
+            }
+            
+            // Teste de localStorage
+            try {
+                localStorage.setItem('test', 'ok');
+                localStorage.removeItem('test');
+                log('localStorage: Funcionando ✅');
+            } catch (e) {
+                log('localStorage: Erro ❌', 'error');
+            }
+        }
+        
+        function showDebugInfo() {
+            log('=== DEBUG MOBILE ===');
+            const mobile = detectMobile();
+            
+            log(`User Agent completo: ${navigator.userAgent}`);
+            log(`Idioma: ${navigator.language}`);
+            log(`Platform: ${navigator.platform}`);
+            log(`Cookie habilitado: ${navigator.cookieEnabled}`);
+            log(`Online: ${navigator.onLine}`);
+            log(`Tela: ${screen.width}x${screen.height} @ ${screen.pixelDepth}bit`);
+            log(`Viewport: ${window.innerWidth}x${window.innerHeight}`);
+            log(`Zoom: ${window.devicePixelRatio || 1}`);
+            
+            if (mobile.isMobile) {
+                log('✅ Dispositivo mobile confirmado');
+            } else {
+                log('ℹ️ Não parece ser mobile');
+            }
+        }
+        
+        function clearLogs() {
+            document.getElementById('logContent').innerHTML = '';
+            log('Logs limpos');
+        }
+        
+        // Inicializar
+        updateEnvironment();
+        
+        // Auto-detectar mudanças de orientação
+        if (screen.orientation) {
+            screen.orientation.addEventListener('change', () => {
+                log(`Orientação mudou para: ${screen.orientation.type}`);
+                updateEnvironment();
+            });
+        }
+    </script>
+</body>
+</html>

@@ -7,22 +7,28 @@ class CloudSync {
         this.syncInterval = null;
         this.clientId = '507473876859-o0urtsgjnetchqkqcf16ium53ejp1tts.apps.googleusercontent.com';
         
-        // Auto-detectar ambiente
-        this.isProduction = window.location.protocol === 'https:' && 
-                           window.location.hostname === 'luizcborba.github.io';
+        // Auto-detectar ambiente - CORRIGIDO PARA MOBILE
+        this.isHTTPS = window.location.protocol === 'https:';
+        this.isGitHubPages = window.location.hostname === 'luizcborba.github.io';
         this.isLocalhost = window.location.hostname === 'localhost' || 
                           window.location.hostname === '127.0.0.1';
+        
+        // Google Auth em HTTPS (incluindo mobile) ou localhost
+        this.shouldUseGoogleAuth = this.isHTTPS || this.isLocalhost;
     }
 
     async initGoogleAuth() {
         console.log('🔍 Detectando ambiente...');
         console.log('Protocol:', window.location.protocol);
         console.log('Hostname:', window.location.hostname);
-        console.log('Production:', this.isProduction);
+        console.log('HTTPS:', this.isHTTPS);
+        console.log('GitHub Pages:', this.isGitHubPages);
         console.log('Localhost:', this.isLocalhost);
+        console.log('User Agent:', navigator.userAgent);
+        console.log('Deve usar Google Auth:', this.shouldUseGoogleAuth);
 
-        // Google Auth apenas em HTTPS (GitHub Pages) ou localhost
-        if (this.isProduction || this.isLocalhost) {
+        // Google Auth em qualquer HTTPS ou localhost (incluindo mobile)
+        if (this.shouldUseGoogleAuth) {
             console.log('✅ Ambiente compatível - Inicializando Google Auth');
             await this.initRealGoogleAuth();
         } else {
@@ -237,12 +243,16 @@ class CloudSync {
             userInfo.style.display = 'block';
         } else {
             // Usuário não logado
-            if (this.auth) {
-                // Google Auth disponível
+            if (this.shouldUseGoogleAuth && this.auth) {
+                // Google Auth disponível e carregado
                 loginBtn.textContent = '🔐 Login Google';
                 loginBtn.style.background = 'linear-gradient(135deg, #4285f4, #34a853)';
+            } else if (this.shouldUseGoogleAuth && !this.auth) {
+                // Google Auth deve estar disponível mas ainda carregando
+                loginBtn.textContent = '⏳ Carregando...';
+                loginBtn.style.background = 'linear-gradient(135deg, #f39c12, #e67e22)';
             } else {
-                // Modo offline
+                // Modo offline (HTTP)
                 loginBtn.textContent = '🔌 Modo Offline';
                 loginBtn.style.background = 'linear-gradient(135deg, #6c757d, #495057)';
             }
