@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Sistema de Cookies - WYD Tracker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .demo-section {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }
+        button {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .reset-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        .status {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+        .preview-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            display: none;
+        }
+        .demo-mobile {
+            max-width: 350px;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍪 Demo - Sistema de Autorização de Cookies</h1>
+        <p>Demonstração do sistema automático de solicitação de cookies para Google Auth</p>
+        
+        <div class="demo-section">
+            <h2>🎯 Como Funciona</h2>
+            <ul>
+                <li>✅ <strong>Detecção automática</strong>: Verifica se precisa de Google Auth</li>
+                <li>🍪 <strong>Modal de cookies</strong>: Solicita autorização elegante</li>
+                <li>📱 <strong>Interface adaptativa</strong>: Otimizada para mobile e desktop</li>
+                <li>🔄 <strong>Fallback inteligente</strong>: Modo offline se usuário recusar</li>
+                <li>⚙️ <strong>Reconfiguração</strong>: Botão para mudar decisão</li>
+            </ul>
+        </div>
+
+        <div class="demo-section">
+            <h2>🧪 Testar Sistema</h2>
+            <p>Use os botões abaixo para simular diferentes cenários:</p>
+            
+            <button onclick="simulateFirstVisit()">🆕 Primeiro Acesso</button>
+            <button onclick="simulateMobile()">📱 Versão Mobile</button>
+            <button onclick="showPreview()">👁️ Visualizar Modal</button>
+            <button onclick="resetCookieSettings()" class="reset-btn">🔄 Reset Configurações</button>
+            
+            <div id="status" class="status">
+                <strong>Status atual:</strong> <span id="currentStatus">Carregando...</span>
+            </div>
+        </div>
+
+        <div class="demo-section demo-mobile">
+            <h3>📱 Preview Mobile</h3>
+            <p style="font-size: 14px;">Interface otimizada para dispositivos móveis com:</p>
+            <ul style="font-size: 13px;">
+                <li>Botões maiores (touch-friendly)</li>
+                <li>Texto adaptado para telas pequenas</li>
+                <li>Instruções específicas mobile</li>
+                <li>Emoji para identificação visual</li>
+            </ul>
+        </div>
+
+        <div class="demo-section">
+            <h2>✨ Benefícios do Sistema</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h3>👨‍💻 Para Desenvolvedores</h3>
+                    <ul style="font-size: 14px;">
+                        <li>🛡️ Compliance automático</li>
+                        <li>🚀 UX sem fricção</li>
+                        <li>📊 Fallback robusto</li>
+                        <li>🔧 Fácil integração</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>👥 Para Usuários</h3>
+                    <ul style="font-size: 14px;">
+                        <li>🎯 Controle total</li>
+                        <li>📱 Experiência fluida</li>
+                        <li>🔄 Reconfiguração fácil</li>
+                        <li>✅ App sempre funciona</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔗 Testar no App Real</h2>
+            <p>Para testar a funcionalidade completa:</p>
+            <button onclick="window.open('index.html', '_blank')">🚀 Abrir WYD Tracker</button>
+            <button onclick="window.open('fix-cookies.html', '_blank')">🔧 Página de Configuração</button>
+        </div>
+    </div>
+
+    <!-- Modal de Preview -->
+    <div id="previewModal" class="preview-modal">
+        <div style="font-size: 48px; margin-bottom: 20px;">🍪</div>
+        <h2 style="margin: 0 0 15px 0;">📱 Cookies para Google Auth</h2>
+        <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.5;">
+            Para usar o <strong>login Google</strong> e <strong>sincronizar</strong> seus dados entre dispositivos, 
+            precisamos ativar cookies de terceiros.
+        </p>
+        <div style="margin-top: 25px;">
+            <button onclick="closePreview()" style="margin: 5px;">✅ Permitir Cookies</button>
+            <button onclick="closePreview()" style="margin: 5px; background: linear-gradient(135deg, #95a5a6, #7f8c8d);">🔌 Modo Offline</button>
+        </div>
+        <p style="margin: 15px 0 0 0; font-size: 12px; opacity: 0.8;">
+            Esta é apenas uma demonstração
+        </p>
+    </div>
+
+    <script src="cookie-manager.js"></script>
+    <script>
+        function updateStatus() {
+            const status = document.getElementById('currentStatus');
+            const accepted = cookieManager.getCookiePreference();
+            const needsPermission = cookieManager.needsCookiePermission();
+            
+            if (accepted) {
+                status.innerHTML = '✅ Cookies aceitos - Google Auth habilitado';
+                status.style.color = '#2ecc71';
+            } else if (needsPermission) {
+                status.innerHTML = '⏳ Aguardando decisão do usuário';
+                status.style.color = '#f39c12';
+            } else {
+                status.innerHTML = '🔌 Modo offline - Cookies recusados';
+                status.style.color = '#95a5a6';
+            }
+        }
+
+        function simulateFirstVisit() {
+            // Reset e simular primeiro acesso
+            cookieManager.resetCookiePreference();
+            cookieManager.modalShown = false;
+            
+            // Simular solicitação
+            cookieManager.requestCookiePermission().then((accepted) => {
+                const message = accepted ? 
+                    '✅ Usuário aceitou cookies!' : 
+                    '🔌 Usuário optou por modo offline';
+                
+                document.getElementById('status').innerHTML = `
+                    <strong>Resultado da simulação:</strong><br>
+                    ${message}
+                `;
+                
+                setTimeout(updateStatus, 2000);
+            });
+        }
+
+        function simulateMobile() {
+            // Simular ambiente mobile
+            Object.defineProperty(navigator, 'userAgent', {
+                get: function() { return 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)'; },
+                configurable: true
+            });
+            
+            cookieManager.resetCookiePreference();
+            cookieManager.modalShown = false;
+            
+            cookieManager.requestCookiePermission().then((accepted) => {
+                const message = accepted ? 
+                    '📱 Mobile: Cookies aceitos!' : 
+                    '📱 Mobile: Modo offline selecionado';
+                
+                document.getElementById('status').innerHTML = `
+                    <strong>Simulação Mobile:</strong><br>
+                    ${message}
+                `;
+                
+                setTimeout(updateStatus, 2000);
+            });
+        }
+
+        function showPreview() {
+            document.getElementById('previewModal').style.display = 'block';
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').style.display = 'none';
+        }
+
+        function resetCookieSettings() {
+            cookieManager.resetCookiePreference();
+            updateStatus();
+            
+            document.getElementById('status').innerHTML = `
+                <strong>Configurações resetadas!</strong><br>
+                ✅ Próximo acesso irá solicitar cookies novamente
+            `;
+        }
+
+        // Inicializar
+        updateStatus();
+        
+        // Fechar modal com ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closePreview();
+            }
+        });
+        
+        // Fechar modal clicando fora
+        document.getElementById('previewModal').addEventListener('click', (e) => {
+            if (e.target.id === 'previewModal') {
+                closePreview();
+            }
+        });
+    </script>
+</body>
+</html>

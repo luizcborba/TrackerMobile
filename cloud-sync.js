@@ -29,8 +29,18 @@ class CloudSync {
         console.log('Deve usar Google Auth:', this.shouldUseGoogleAuth);
 
         if (this.shouldUseGoogleAuth) {
-            console.log('✅ Ambiente compatível - Tentando Google Auth');
-            await this.tryGoogleAuth();
+            console.log('✅ Ambiente compatível - Verificando permissões de cookies...');
+            
+            // Solicitar permissão de cookies se necessário
+            const cookiesAccepted = await cookieManager.requestCookiePermission();
+            
+            if (cookiesAccepted) {
+                console.log('✅ Cookies autorizados - Iniciando Google Auth');
+                await this.tryGoogleAuth();
+            } else {
+                console.log('🔌 Usuário optou por modo offline');
+                this.initOfflineMode();
+            }
         } else {
             console.log('ℹ️ Ambiente HTTP - Modo offline');
             this.initOfflineMode();
@@ -313,18 +323,75 @@ class CloudSync {
                 loginBtn.textContent = '⏳ Carregando...';
                 loginBtn.style.background = 'linear-gradient(135deg, #f39c12, #e67e22)';
             } else if (this.fallbackMode) {
-                // Fallback por problemas técnicos
-                loginBtn.textContent = '⚠️ Offline (Cookies?)';
+                // Fallback por problemas técnicos - mostrar opção de reconfigurar
+                loginBtn.textContent = '⚠️ Reconfigurar Cookies';
                 loginBtn.style.background = 'linear-gradient(135deg, #e67e22, #d35400)';
+                loginBtn.onclick = () => this.reconfigureCookies();
             } else {
                 // Modo offline normal
                 loginBtn.textContent = '🔌 Modo Offline';
                 loginBtn.style.background = 'linear-gradient(135deg, #6c757d, #495057)';
+                loginBtn.onclick = () => this.signIn();
             }
             
-            loginBtn.onclick = () => this.signIn();
             userInfo.style.display = 'none';
         }
+        
+        // Adicionar botão de configurações de cookies se necessário
+        this.addCookieSettingsButton();
+    }
+    
+    async reconfigureCookies() {
+        // Resetar preferências e solicitar novamente
+        cookieManager.resetCookiePreference();
+        this.fallbackMode = false;
+        this.initAttempted = false;
+        
+        showAchievement('🔄 Reconfigurando cookies...');
+        await this.initGoogleAuth();
+    }
+    
+    addCookieSettingsButton() {
+        // Adicionar botão discreto para configurações de cookies
+        if (document.getElementById('cookieSettings')) return; // Já existe
+        
+        const settingsBtn = document.createElement('button');
+        settingsBtn.id = 'cookieSettings';
+        settingsBtn.innerHTML = '🍪';
+        settingsBtn.title = 'Configurações de Cookies';
+        settingsBtn.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        `;
+        
+        settingsBtn.onclick = () => {
+            cookieManager.resetCookiePreference();
+            this.reconfigureCookies();
+        };
+        
+        settingsBtn.onmouseenter = () => {
+            settingsBtn.style.background = 'rgba(0, 0, 0, 0.8)';
+            settingsBtn.style.transform = 'scale(1.1)';
+        };
+        
+        settingsBtn.onmouseleave = () => {
+            settingsBtn.style.background = 'rgba(0, 0, 0, 0.5)';
+            settingsBtn.style.transform = 'scale(1)';
+        };
+        
+        document.body.appendChild(settingsBtn);
     }
 }
 
