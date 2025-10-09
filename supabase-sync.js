@@ -96,11 +96,12 @@ class SupabaseSync {
     }
 
     handleAuthChange(event, session) {
+        console.log(`🔐 Auth change: ${event}`, session?.user?.email || 'No user');
         this.user = session?.user || null;
         this.updateUI();
-
-        if (event === 'SIGNED_IN') {
-            showAchievement(`✅ Login: ${this.user.user_metadata.name}`);
+        
+        if (event === 'SIGNED_IN' && this.user) {
+            showAchievement(`🎉 Bem-vindo, ${this.user.user_metadata?.full_name || this.user.email}!`);
             this.downloadData();
         } else if (event === 'SIGNED_OUT') {
             showAchievement('👋 Usuário deslogado');

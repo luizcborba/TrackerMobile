@@ -757,7 +757,7 @@
             const accessToken = hashParams.get('access_token');
             const refreshToken = hashParams.get('refresh_token');
             
-            if (accessToken && window.supabaseSync) {
+            if (accessToken && window.supabaseSync && window.supabaseSync.supabase) {
                 console.log('🔐 Tokens encontrados na URL, processando...');
                 
                 // Set session with tokens
@@ -767,17 +767,25 @@
                 }).then(({ data, error }) => {
                     if (error) {
                         console.error('❌ Erro ao definir sessão:', error);
+                        showAchievement(`❌ Erro no login: ${error.message}`);
                     } else {
-                        console.log('✅ Sessão definida com sucesso!');
+                        console.log('✅ Sessão definida com sucesso!', data.user?.email);
                         window.supabaseSync.user = data.user;
                         window.supabaseSync.updateUI();
                         
                         // Clear URL hash
-                        window.location.hash = '';
+                        history.replaceState(null, null, window.location.pathname);
                         
                         showAchievement('🎉 Login realizado com sucesso!');
                     }
+                }).catch(err => {
+                    console.error('❌ Erro ao processar tokens:', err);
+                    showAchievement(`❌ Erro ao processar login: ${err.message}`);
                 });
+            } else if (accessToken) {
+                console.log('⏳ Aguardando Supabase inicializar...');
+                // Tentar novamente em 500ms
+                setTimeout(processAuthFromURL, 500);
             }
         }
 
