@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Debug Supabase</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+        }
+        
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        
+        .test-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .success { color: #2ecc71; }
+        .error { color: #e74c3c; }
+        .warning { color: #f39c12; }
+        
+        .logs {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug Completo Supabase</h1>
+        
+        <div class="status-card">
+            <h3>📊 Verificações Básicas</h3>
+            <div id="basicChecks">Verificando...</div>
+        </div>
+        
+        <div class="status-card">
+            <h3>🔗 Testes de Conectividade</h3>
+            <button class="test-btn" onclick="testDirectSupabase()">
+                🧪 Teste Direto Supabase
+            </button>
+            <button class="test-btn" onclick="testScriptLoading()">
+                📜 Teste Carregamento Scripts
+            </button>
+            <button class="test-btn" onclick="testURLAccess()">
+                🌐 Teste Acesso URL
+            </button>
+        </div>
+        
+        <div class="status-card">
+            <h3>📝 Logs Detalhados</h3>
+            <button class="test-btn" onclick="clearLogs()" style="float: right; padding: 5px 10px;">
+                🗑️ Limpar
+            </button>
+            <div id="logs" class="logs">
+                [Iniciando verificações...]<br>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#e74c3c' : type === 'success' ? '#2ecc71' : type === 'warning' ? '#f39c12' : '#3498db';
+            
+            logs.innerHTML += `<span style="color: ${color}">[${timestamp}] ${message}</span><br>`;
+            logs.scrollTop = logs.scrollHeight;
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+        }
+
+        function runBasicChecks() {
+            const basicChecks = document.getElementById('basicChecks');
+            let checks = [];
+
+            // Verificar se estamos em HTTPS
+            checks.push(`HTTPS: ${location.protocol === 'https:' ? '✅' : '❌'} (${location.protocol})`);
+            
+            // Verificar se scripts estão carregados
+            checks.push(`window.supabase: ${window.supabase ? '✅' : '❌'}`);
+            checks.push(`window.supabaseSync: ${window.supabaseSync ? '✅' : '❌'}`);
+            
+            // Verificar navigator
+            checks.push(`Navigator: ${navigator ? '✅' : '❌'}`);
+            checks.push(`Fetch API: ${window.fetch ? '✅' : '❌'}`);
+            
+            // Verificar origem
+            checks.push(`Origin: ${location.origin}`);
+            
+            basicChecks.innerHTML = checks.map(check => `<div>${check}</div>`).join('');
+            
+            // Log detalhado
+            checks.forEach(check => log(check));
+        }
+
+        async function testDirectSupabase() {
+            log('🧪 Testando Supabase diretamente...', 'info');
+            
+            try {
+                // Tentar carregar biblioteca do Supabase diretamente
+                if (!window.supabase) {
+                    log('📦 Carregando biblioteca Supabase...', 'info');
+                    await loadSupabaseLibrary();
+                }
+                
+                const SUPABASE_URL = 'https://qhmgdguuxmnzpousatrn.supabase.co';
+                const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFobWdkZ3V1eG1uenBvdXNhdHJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5NjA4MDMsImV4cCI6MjA3NTUzNjgwM30.AIdD2iVHQi_nOqiCxybHlaDNW6M9Q2LCTB7v2is-RlY';
+                
+                log(`📡 Conectando em: ${SUPABASE_URL}`, 'info');
+                
+                const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                log('✅ Cliente Supabase criado com sucesso!', 'success');
+                
+                // Testar conexão simples
+                const { data, error } = await supabase.from('game_data').select('count');
+                
+                if (error) {
+                    log(`⚠️ Erro esperado (tabela pode não existir): ${error.message}`, 'warning');
+                } else {
+                    log('✅ Conexão com banco estabelecida!', 'success');
+                }
+                
+            } catch (error) {
+                log(`❌ Erro na conexão direta: ${error.message}`, 'error');
+                console.error('Erro completo:', error);
+            }
+        }
+
+        async function loadSupabaseLibrary() {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+                script.onload = () => {
+                    log('✅ Biblioteca Supabase carregada via CDN', 'success');
+                    resolve();
+                };
+                script.onerror = (error) => {
+                    log('❌ Erro ao carregar biblioteca Supabase', 'error');
+                    reject(error);
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        async function testScriptLoading() {
+            log('📜 Testando carregamento de scripts...', 'info');
+            
+            // Verificar se supabase-sync.js está carregado
+            const scripts = Array.from(document.scripts);
+            const supabaseScript = scripts.find(script => script.src.includes('supabase-sync.js'));
+            
+            if (supabaseScript) {
+                log(`✅ Script encontrado: ${supabaseScript.src}`, 'success');
+                
+                // Tentar fazer fetch do script para verificar se existe
+                try {
+                    const response = await fetch(supabaseScript.src);
+                    if (response.ok) {
+                        const content = await response.text();
+                        log(`✅ Script acessível (${content.length} caracteres)`, 'success');
+                        
+                        // Verificar se contém as classes esperadas
+                        if (content.includes('class SupabaseSync')) {
+                            log('✅ Classe SupabaseSync encontrada no script', 'success');
+                        } else {
+                            log('❌ Classe SupabaseSync NÃO encontrada no script', 'error');
+                        }
+                        
+                    } else {
+                        log(`❌ Script não acessível: ${response.status}`, 'error');
+                    }
+                } catch (error) {
+                    log(`❌ Erro ao acessar script: ${error.message}`, 'error');
+                }
+                
+            } else {
+                log('❌ Script supabase-sync.js não encontrado', 'error');
+            }
+            
+            // Listar todos os scripts carregados
+            log('📋 Scripts carregados:', 'info');
+            scripts.forEach((script, index) => {
+                if (script.src) {
+                    log(`  ${index + 1}. ${script.src}`, 'info');
+                }
+            });
+        }
+
+        async function testURLAccess() {
+            log('🌐 Testando acesso às URLs...', 'info');
+            
+            const urls = [
+                'https://luizcborba.github.io/TrackerMobile/supabase-sync.js',
+                'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+                'https://qhmgdguuxmnzpousatrn.supabase.co'
+            ];
+            
+            for (const url of urls) {
+                try {
+                    log(`🔗 Testando: ${url}`, 'info');
+                    const response = await fetch(url, { method: 'HEAD' });
+                    log(`✅ ${url} - Status: ${response.status}`, 'success');
+                } catch (error) {
+                    log(`❌ ${url} - Erro: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        // Verificações iniciais
+        window.addEventListener('load', () => {
+            log('🚀 Página carregada, iniciando verificações...', 'info');
+            runBasicChecks();
+            
+            // Verificar se supabaseSync está disponível após um delay
+            setTimeout(() => {
+                if (window.supabaseSync) {
+                    log('✅ supabaseSync está disponível!', 'success');
+                } else {
+                    log('❌ supabaseSync NÃO está disponível após 2 segundos', 'error');
+                    
+                    // Tentar carregar manualmente
+                    log('🔄 Tentando carregar supabase-sync.js manualmente...', 'info');
+                    const script = document.createElement('script');
+                    script.src = './supabase-sync.js';
+                    script.onload = () => {
+                        log('✅ supabase-sync.js carregado manualmente', 'success');
+                        setTimeout(() => {
+                            if (window.supabaseSync) {
+                                log('✅ supabaseSync agora disponível!', 'success');
+                            } else {
+                                log('❌ supabaseSync ainda não disponível', 'error');
+                            }
+                        }, 1000);
+                    };
+                    script.onerror = () => {
+                        log('❌ Erro ao carregar supabase-sync.js manualmente', 'error');
+                    };
+                    document.head.appendChild(script);
+                }
+            }, 2000);
+        });
+
+        // Atualizar verificações periodicamente
+        setInterval(runBasicChecks, 10000);
+    </script>
+    
+    <!-- Tentar carregar o script original -->
+    <script src="supabase-sync.js"></script>
+</body>
+</html>
