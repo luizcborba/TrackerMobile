@@ -363,6 +363,96 @@
         .celebrating {
             animation: celebration 0.5s ease;
         }
+
+        /* Seção de Doação */
+        .donation-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 2px solid rgba(230, 126, 34, 0.4);
+            text-align: center;
+        }
+
+        .donation-title {
+            color: #e67e22;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .donation-description {
+            color: #bbb;
+            font-size: 0.85em;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .qr-code-container {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px auto;
+            width: fit-content;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .qr-code {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .pix-code-container {
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(230, 126, 34, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 15px 0;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 0.75em;
+            color: #ddd;
+            position: relative;
+        }
+
+        .copy-button {
+            background: #e67e22;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+        }
+
+        .copy-button:hover {
+            background: #d35400;
+            transform: scale(1.05);
+        }
+
+        .copy-button:active {
+            transform: scale(0.95);
+        }
+
+        .copy-button.copied {
+            background: #2ecc71;
+        }
+
+        .donation-footer {
+            color: #999;
+            font-size: 0.75em;
+            margin-top: 10px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -498,6 +588,32 @@
 
             <div class="reset-timer">
                 Reset diário em: <strong id="resetTimer">00:00:00</strong>
+            </div>
+
+            <!-- Seção de Doação -->
+            <div class="donation-section">
+                <div class="donation-title">
+                    ☕ Apoie o Desenvolvimento
+                </div>
+                <div class="donation-description">
+                    Gostou do WYD Quest Tracker? Ajude a manter e melhorar o app com uma doação espontânea via PIX! 🙏
+                </div>
+                
+                <div class="qr-code-container">
+                    <canvas class="qr-code" id="qrCode"></canvas>
+                </div>
+                
+                <div class="pix-code-container" id="pixCodeContainer">
+                    00020126330014br.gov.bcb.pix0111095200519025204000053039865802BR5920Luiz Carlos De Borba6009Sao Paulo62290525REC68E82105273231834217796304AA68
+                </div>
+                
+                <button class="copy-button" id="copyPixButton" onclick="copyPixCode()">
+                    📋 Copiar Código PIX
+                </button>
+                
+                <div class="donation-footer">
+                    Qualquer valor é muito bem-vindo! 💝
+                </div>
             </div>
         </div>
     </div>
@@ -1001,6 +1117,122 @@
                 closeBtn.textContent = '✅ Confirmado! Parar aviso';
             };
         }
+
+        // Função para copiar código PIX
+        function copyPixCode() {
+            const pixCode = "00020126330014br.gov.bcb.pix0111095200519025204000053039865802BR5920Luiz Carlos De Borba6009Sao Paulo62290525REC68E82105273231834217796304AA68";
+            const button = document.getElementById('copyPixButton');
+            
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(pixCode).then(() => {
+                    button.textContent = '✅ Copiado!';
+                    button.classList.add('copied');
+                    showAchievement('💰 Código PIX copiado! Obrigado pelo apoio! 🙏');
+                    
+                    setTimeout(() => {
+                        button.textContent = '📋 Copiar Código PIX';
+                        button.classList.remove('copied');
+                    }, 3000);
+                }).catch(() => {
+                    fallbackCopy();
+                });
+            } else {
+                fallbackCopy();
+            }
+            
+            function fallbackCopy() {
+                const textArea = document.createElement('textarea');
+                textArea.value = pixCode;
+                textArea.style.position = 'fixed';
+                textArea.style.opacity = '0';
+                document.body.appendChild(textArea);
+                textArea.select();
+                textArea.setSelectionRange(0, 99999);
+                
+                try {
+                    document.execCommand('copy');
+                    button.textContent = '✅ Copiado!';
+                    button.classList.add('copied');
+                    showAchievement('💰 Código PIX copiado! Obrigado pelo apoio! 🙏');
+                    
+                    setTimeout(() => {
+                        button.textContent = '📋 Copiar Código PIX';
+                        button.classList.remove('copied');
+                    }, 3000);
+                } catch (err) {
+                    showAchievement('❌ Erro ao copiar. Tente selecionar o texto manualmente.');
+                }
+                
+                document.body.removeChild(textArea);
+            }
+        }
+
+        // Função para gerar QR Code
+        function generateQRCode() {
+            const canvas = document.getElementById('qrCode');
+            const ctx = canvas.getContext('2d');
+            const pixCode = "00020126330014br.gov.bcb.pix0111095200519025204000053039865802BR5920Luiz Carlos De Borba6009Sao Paulo62290525REC68E82105273231834217796304AA68";
+            
+            canvas.width = 150;
+            canvas.height = 150;
+            
+            // Tenta carregar QR code de API externa
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, 150, 150);
+            };
+            img.onerror = function() {
+                // Fallback: desenha um QR code simples
+                drawSimpleQRCode(ctx, pixCode);
+            };
+            
+            // Usa API gratuita para gerar QR code
+            img.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(pixCode)}`;
+        }
+
+        function drawSimpleQRCode(ctx, pixCode) {
+            // Fundo branco
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, 150, 150);
+            
+            // Simula um QR code com padrão de pontos
+            ctx.fillStyle = '#000000';
+            
+            // Cria padrão pseudo-QR code baseado no código PIX
+            const gridSize = 15;
+            const cellSize = 150 / gridSize;
+            
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    // Usa hash simples do código PIX para determinar quais células preencher
+                    const hash = (pixCode.charCodeAt((i * gridSize + j) % pixCode.length) + i + j) % 2;
+                    if (hash === 0) {
+                        ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                    }
+                }
+            }
+            
+            // Adiciona cantos do QR code (marca de posição)
+            drawPositionMarker(ctx, 0, 0, cellSize);
+            drawPositionMarker(ctx, (gridSize - 7) * cellSize, 0, cellSize);
+            drawPositionMarker(ctx, 0, (gridSize - 7) * cellSize, cellSize);
+        }
+
+        function drawPositionMarker(ctx, x, y, cellSize) {
+            // Marca de posição do QR code (7x7)
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(x, y, 7 * cellSize, 7 * cellSize);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(x + cellSize, y + cellSize, 5 * cellSize, 5 * cellSize);
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(x + 2 * cellSize, y + 2 * cellSize, 3 * cellSize, 3 * cellSize);
+        }
+
+        // Gera o QR code quando a página carrega
+        document.addEventListener('DOMContentLoaded', function() {
+            generateQRCode();
+        });
     </script>
 </body>
 </html>
