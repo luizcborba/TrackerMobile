@@ -757,35 +757,52 @@
             const accessToken = hashParams.get('access_token');
             const refreshToken = hashParams.get('refresh_token');
             
-            if (accessToken && window.supabaseSync && window.supabaseSync.supabase) {
+            if (accessToken && refreshToken) {
                 console.log('🔐 Tokens encontrados na URL, processando...');
                 
-                // Set session with tokens
-                window.supabaseSync.supabase.auth.setSession({
-                    access_token: accessToken,
-                    refresh_token: refreshToken
-                }).then(({ data, error }) => {
-                    if (error) {
-                        console.error('❌ Erro ao definir sessão:', error);
-                        showAchievement(`❌ Erro no login: ${error.message}`);
+                // Try multiple times until supabaseSync is ready
+                let attempts = 0;
+                const maxAttempts = 10;
+                
+                const trySetSession = () => {
+                    attempts++;
+                    
+                    if (window.supabaseSync && window.supabaseSync.supabase && window.supabaseSync.isInitialized) {
+                        console.log('✅ SupabaseSync pronto, definindo sessão...');
+                        
+                        window.supabaseSync.supabase.auth.setSession({
+                            access_token: accessToken,
+                            refresh_token: refreshToken
+                        }).then(({ data, error }) => {
+                            if (error) {
+                                console.error('❌ Erro ao definir sessão:', error);
+                                showAchievement(`❌ Erro no login: ${error.message}`);
+                            } else {
+                                console.log('✅ Sessão definida com sucesso!', data.user?.email);
+                                window.supabaseSync.user = data.user;
+                                window.supabaseSync.updateUI();
+                                
+                                // Clear URL hash
+                                history.replaceState(null, null, window.location.pathname);
+                                
+                                const userName = data.user?.user_metadata?.full_name || data.user?.user_metadata?.name || data.user?.email || 'Usuário';
+                                showAchievement(`🎉 Bem-vindo, ${userName}!`);
+                            }
+                        }).catch(err => {
+                            console.error('❌ Erro ao processar tokens:', err);
+                            showAchievement(`❌ Erro ao processar login: ${err.message}`);
+                        });
+                        
+                    } else if (attempts < maxAttempts) {
+                        console.log(`⏳ Tentativa ${attempts}/${maxAttempts} - Aguardando Supabase...`);
+                        setTimeout(trySetSession, 500);
                     } else {
-                        console.log('✅ Sessão definida com sucesso!', data.user?.email);
-                        window.supabaseSync.user = data.user;
-                        window.supabaseSync.updateUI();
-                        
-                        // Clear URL hash
-                        history.replaceState(null, null, window.location.pathname);
-                        
-                        showAchievement('🎉 Login realizado com sucesso!');
+                        console.error('❌ Timeout: SupabaseSync não inicializou');
+                        showAchievement('❌ Erro: Sistema não inicializou corretamente');
                     }
-                }).catch(err => {
-                    console.error('❌ Erro ao processar tokens:', err);
-                    showAchievement(`❌ Erro ao processar login: ${err.message}`);
-                });
-            } else if (accessToken) {
-                console.log('⏳ Aguardando Supabase inicializar...');
-                // Tentar novamente em 500ms
-                setTimeout(processAuthFromURL, 500);
+                };
+                
+                trySetSession();
             }
         }
 
