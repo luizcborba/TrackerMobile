@@ -13,39 +13,6 @@
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1f1f1f">
     <meta name="color-scheme" content="dark">
     
-    <!-- Apple PWA -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="WYD Tracker">
-    <meta name="apple-touch-fullscreen" content="yes">
-    <meta name="format-detection" content="telephone=no">
-    <link rel="apple-touch-startup-image" href="./icon-192x192.png">
-    
-    <!-- Microsoft PWA -->
-    <meta name="msapplication-TileColor" content="#1f1f1f">
-    <meta name="msapplication-TileImage" content="./icon-192x192.png">
-    <meta name="msapplication-navbutton-color" content="#e67e22">
-    <meta name="msapplication-starturl" content="./index.html?source=pwa">
-    <meta name="msapplication-window" content="width=400;height=600">
-    <meta name="msapplication-task" content="name=Arenas;action-uri=./index.html#arenas;icon-uri=./icon-72x72.png">
-    
-    <!-- General PWA -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="WYD Tracker">
-    <meta name="standalone" content="yes">
-    <meta name="fullscreen" content="yes">
-    
-    <!-- PWA Display Mode -->
-    <meta name="display-mode" content="standalone">
-    <meta name="viewport-fit" content="cover">
-    
-    <!-- Force Standalone Mode -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="referrer" content="no-referrer">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="HandheldFriendly" content="true">
-    <meta name="MobileOptimized" content="320">
-    
     <!-- PWA Manifest -->
     <link rel="manifest" href="./manifest.json">
     
@@ -861,79 +828,15 @@
             border-color: rgba(46, 204, 113, 0.5);
         }
 
-        /* Estilos específicos para modo standalone */
-        .standalone-mode {
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
-        }
-
-        .standalone-mode .container {
+        /* === HALLOWEEN THEME === */
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1810 50%, #1a1a1a 100%);
             min-height: 100vh;
-            padding-top: 10px;
+            overflow-x: hidden;
         }
 
-        /* Modo PWA - esconde scroll bars */
-        .standalone-mode::-webkit-scrollbar {
-            width: 0px;
-            background: transparent;
-        }
-
-        .standalone-mode {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        /* Otimizações para modo app */
-        .standalone-mode * {
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-
-        .standalone-mode input,
-        .standalone-mode textarea {
-            -webkit-user-select: text;
-            user-select: text;
-        }
-
-        /* Indicador visual de modo standalone */
-        .standalone-mode::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #e67e22, #f39c12, #e67e22);
-            z-index: 9999;
-            animation: standalone-indicator 3s ease-in-out infinite;
-        }
-
-        @keyframes standalone-indicator {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.7; }
-        }
-
-        /* Status bar para iOS em modo standalone */
-        @supports (padding-top: env(safe-area-inset-top)) {
-            .standalone-mode {
-                padding-top: calc(env(safe-area-inset-top) + 10px);
-            }
-        }
-
-        /* Força altura total em modo app */
-        @media (display-mode: standalone) {
-            html, body {
-                height: 100vh;
-                overflow-x: hidden;
-            }
-            
-            .container {
-                min-height: calc(100vh - 20px);
-            }
+        .container {
+            min-height: calc(100vh - 20px);
         }
     </style>
 </head>
@@ -1803,79 +1706,7 @@
         // Gera o QR code quando a página carrega
         document.addEventListener('DOMContentLoaded', function() {
             generateQRCode();
-            
-            // Detecta e força modo standalone
-            checkStandaloneMode();
         });
-
-        // === STANDALONE MODE DETECTION ===
-        function checkStandaloneMode() {
-            const isStandaloneMode = window.navigator.standalone || 
-                                   window.matchMedia('(display-mode: standalone)').matches ||
-                                   window.matchMedia('(display-mode: fullscreen)').matches ||
-                                   window.matchMedia('(display-mode: minimal-ui)').matches;
-            
-            if (isStandaloneMode) {
-                console.log('PWA: Running in TRUE standalone mode');
-                document.body.classList.add('standalone-mode');
-                
-                // Esconde elementos do navegador se existirem
-                hideNavigationElements();
-                
-                // Adiciona comportamentos específicos de app
-                enableAppBehaviors();
-                
-                // Notifica que é um app real
-                setTimeout(() => {
-                    if (!localStorage.getItem('standaloneWelcomeShown')) {
-                        showAchievement('🎃 Bem-vindo ao WYD Quest Tracker! 📱 App instalado com sucesso!', 'install-success');
-                        localStorage.setItem('standaloneWelcomeShown', 'true');
-                    }
-                }, 2000);
-            } else {
-                console.log('PWA: Running in browser mode');
-                document.body.classList.add('browser-mode');
-            }
-            
-            // Força atualizações de modo standalone
-            window.addEventListener('resize', () => {
-                const currentMode = window.matchMedia('(display-mode: standalone)').matches;
-                if (currentMode !== isStandaloneMode) {
-                    location.reload();
-                }
-            });
-        }
-
-        function hideNavigationElements() {
-            // Esconde barras de navegação do navegador se possível
-            if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
-                // Não forçar fullscreen automático, mas preparar interface
-                document.body.style.paddingTop = '0';
-            }
-        }
-
-        function enableAppBehaviors() {
-            // Previne zoom indesejado
-            document.addEventListener('touchstart', function(e) {
-                if (e.touches.length > 1) {
-                    e.preventDefault();
-                }
-            });
-            
-            // Previne seleção de texto acidental
-            document.addEventListener('selectstart', function(e) {
-                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-                    e.preventDefault();
-                }
-            });
-            
-            // Melhora performance em modo app
-            if ('requestIdleCallback' in window) {
-                requestIdleCallback(() => {
-                    console.log('PWA: App optimizations enabled');
-                });
-            }
-        }
 
         // === PWA INSTALLATION SYSTEM ===
         let deferredPrompt;
@@ -2032,8 +1863,6 @@
                     return;
                 }
 
-                // Se não está instalado e não há prompt nativo
-                if (!deferredPrompt) {
                 // Se não está instalado e não há prompt nativo
                 if (!deferredPrompt) {
                     if (isIOS()) {
