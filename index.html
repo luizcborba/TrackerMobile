@@ -18,16 +18,30 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="WYD Tracker">
     <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="apple-touch-startup-image" href="./icon-192x192.png">
     
     <!-- Microsoft PWA -->
     <meta name="msapplication-TileColor" content="#1f1f1f">
     <meta name="msapplication-TileImage" content="./icon-192x192.png">
     <meta name="msapplication-navbutton-color" content="#e67e22">
-    <meta name="msapplication-starturl" content="./index.html">
+    <meta name="msapplication-starturl" content="./index.html?source=pwa">
+    <meta name="msapplication-window" content="width=400;height=600">
+    <meta name="msapplication-task" content="name=Arenas;action-uri=./index.html#arenas;icon-uri=./icon-72x72.png">
     
     <!-- General PWA -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="WYD Tracker">
+    <meta name="standalone" content="yes">
+    <meta name="fullscreen" content="yes">
+    
+    <!-- PWA Display Mode -->
+    <meta name="display-mode" content="standalone">
+    <meta name="viewport-fit" content="cover">
+    
+    <!-- Force Standalone Mode -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="referrer" content="no-referrer">
     <meta name="format-detection" content="telephone=no">
     <meta name="HandheldFriendly" content="true">
     <meta name="MobileOptimized" content="320">
@@ -634,49 +648,52 @@
         /* Botão de Instalação PWA */
         .install-pwa-button {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             background: linear-gradient(135deg, #e67e22, #f39c12);
             color: white;
             border: none;
-            padding: 12px 16px;
-            border-radius: 25px;
-            font-size: 0.9em;
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(230, 126, 34, 0.4);
+            box-shadow: 0 6px 20px rgba(230, 126, 34, 0.5);
             z-index: 1001;
             transition: all 0.3s ease;
             display: none;
             touch-action: manipulation;
-            animation: bounce 2s infinite;
+            animation: install-pulse 3s ease-in-out infinite;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        @keyframes install-pulse {
+            0%, 100% { 
+                transform: translateX(-50%) scale(1);
+                box-shadow: 0 6px 20px rgba(230, 126, 34, 0.5);
+            }
+            50% { 
+                transform: translateX(-50%) scale(1.05);
+                box-shadow: 0 8px 25px rgba(230, 126, 34, 0.7);
+            }
         }
 
         .install-pwa-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(230, 126, 34, 0.6);
+            transform: translateX(-50%) scale(1.08);
+            box-shadow: 0 8px 30px rgba(230, 126, 34, 0.8);
         }
 
         .install-pwa-button:active {
-            transform: scale(0.95);
+            transform: translateX(-50%) scale(1.02);
         }
 
         .install-pwa-button.show {
             display: flex;
             align-items: center;
-            gap: 8px;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-5px);
-            }
-            60% {
-                transform: translateY(-3px);
-            }
+            justify-content: center;
+            gap: 10px;
         }
 
         /* Banner de instalação iOS */
@@ -687,7 +704,7 @@
             right: 0;
             background: linear-gradient(135deg, #e67e22, #f39c12);
             color: white;
-            padding: 15px 20px;
+            padding: 20px;
             text-align: center;
             z-index: 1001;
             display: none;
@@ -701,33 +718,127 @@
 
         .ios-install-banner .close-banner {
             position: absolute;
-            top: 10px;
-            right: 15px;
-            background: none;
+            top: 15px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
             border: none;
             color: white;
-            font-size: 1.2em;
+            font-size: 1.4em;
             cursor: pointer;
-            padding: 5px;
+            padding: 8px;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .ios-install-banner .install-steps {
-            font-size: 0.9em;
-            margin-top: 10px;
+            font-size: 0.95em;
+            margin-top: 15px;
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 15px;
             flex-wrap: wrap;
         }
 
         .ios-install-banner .step {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Banner universal de instalação */
+        .universal-install-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #ff8c42, #e67e22);
+            color: white;
+            padding: 18px 50px 18px 20px;
+            text-align: left;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .universal-install-banner:hover {
+            background: linear-gradient(135deg, #f39c12, #d35400);
+        }
+
+        .universal-install-banner.show {
+            display: block;
+            animation: slideDown 0.5s ease;
+        }
+
+        .universal-install-banner .close-banner {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
             background: rgba(255, 255, 255, 0.2);
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8em;
+            border: none;
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .universal-install-banner .close-banner:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .universal-install-banner .install-text {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 1.05em;
+        }
+
+        .universal-install-banner .install-hint {
+            font-size: 0.9em;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        /* Ajuste para mobile */
+        @media (max-width: 480px) {
+            .universal-install-banner {
+                padding: 15px 45px 15px 15px;
+            }
+            
+            .universal-install-banner .install-text {
+                font-size: 1em;
+            }
+            
+            .universal-install-banner .install-hint {
+                font-size: 0.85em;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+            }
+            to {
+                transform: translateY(0);
+            }
         }
 
         @keyframes slideUp {
@@ -749,6 +860,81 @@
             background: linear-gradient(135deg, #2ecc71, #27ae60);
             border-color: rgba(46, 204, 113, 0.5);
         }
+
+        /* Estilos específicos para modo standalone */
+        .standalone-mode {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+
+        .standalone-mode .container {
+            min-height: 100vh;
+            padding-top: 10px;
+        }
+
+        /* Modo PWA - esconde scroll bars */
+        .standalone-mode::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        .standalone-mode {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Otimizações para modo app */
+        .standalone-mode * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .standalone-mode input,
+        .standalone-mode textarea {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+
+        /* Indicador visual de modo standalone */
+        .standalone-mode::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #e67e22, #f39c12, #e67e22);
+            z-index: 9999;
+            animation: standalone-indicator 3s ease-in-out infinite;
+        }
+
+        @keyframes standalone-indicator {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Status bar para iOS em modo standalone */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            .standalone-mode {
+                padding-top: calc(env(safe-area-inset-top) + 10px);
+            }
+        }
+
+        /* Força altura total em modo app */
+        @media (display-mode: standalone) {
+            html, body {
+                height: 100vh;
+                overflow-x: hidden;
+            }
+            
+            .container {
+                min-height: calc(100vh - 20px);
+            }
+        }
     </style>
 </head>
 <body>
@@ -757,15 +943,22 @@
 
     <!-- Botão de Instalação PWA -->
     <button id="installPWABtn" class="install-pwa-button">
-        📱 Instalar App
+        📱 Instalar WYD Quest Tracker
     </button>
+
+    <!-- Banner universal de instalação -->
+    <div id="universalInstallBanner" class="universal-install-banner">
+        <button class="close-banner" onclick="closeUniversalBanner()">×</button>
+        <div class="install-text">🎃 Instale o WYD Quest Tracker! 👻</div>
+        <div class="install-hint">Acesso rápido direto da sua tela inicial</div>
+    </div>
 
     <!-- Banner de instalação iOS -->
     <div id="iosInstallBanner" class="ios-install-banner">
         <button class="close-banner" onclick="closeIOSBanner()">×</button>
         <strong>📱 Instalar WYD Quest Tracker</strong>
         <div class="install-steps">
-            <span class="step">1️⃣ Toque no ícone compartilhar</span>
+            <span class="step">1️⃣ Toque no ícone compartilhar ↗️</span>
             <span class="step">2️⃣ Role para baixo</span>
             <span class="step">3️⃣ Toque em "Adicionar à Tela de Início"</span>
         </div>
@@ -826,7 +1019,7 @@
                     <div class="quest-subcheck" data-subquest="expedicao-3"></div>
                 </div>
                 <div class="quest-info">
-                    <div class="quest-name">Expedição (0/3)</div>
+                    <div class="quest-name" id="expedicao-title">Expedição (0/3)</div>
                 </div>
             </div>
 
@@ -836,7 +1029,7 @@
                     <div class="quest-subcheck" data-subquest="infernal-2"></div>
                 </div>
                 <div class="quest-info">
-                    <div class="quest-name">Infernal (0/2)</div>
+                    <div class="quest-name" id="infernal-title">Infernal (0/2)</div>
                 </div>
             </div>
 
@@ -1190,6 +1383,25 @@
             } else {
                 document.querySelector('[data-quest="infernal"]').classList.remove('completed');
             }
+            
+            // Atualiza os contadores nos títulos das multi-quests
+            updateMultiQuestTitles();
+        }
+
+        function updateMultiQuestTitles() {
+            // Atualiza contador da Expedição
+            const expedicaoCompleted = ['expedicao-1', 'expedicao-2', 'expedicao-3'].filter(id => data.subquests[id]).length;
+            const expedicaoElement = document.getElementById('expedicao-title');
+            if (expedicaoElement) {
+                expedicaoElement.textContent = `Expedição (${expedicaoCompleted}/3)`;
+            }
+            
+            // Atualiza contador do Infernal
+            const infernalCompleted = ['infernal-1', 'infernal-2'].filter(id => data.subquests[id]).length;
+            const infernalElement = document.getElementById('infernal-title');
+            if (infernalElement) {
+                infernalElement.textContent = `Infernal (${infernalCompleted}/2)`;
+            }
         }
 
         function showAchievement(text) {
@@ -1423,6 +1635,7 @@
         }
 
         loadData();
+        updateMultiQuestTitles(); // Atualiza os títulos na inicialização
         updateTimer();
         setInterval(updateTimer, 1000);
         setInterval(checkDailyReset, 60000);
@@ -1590,12 +1803,85 @@
         // Gera o QR code quando a página carrega
         document.addEventListener('DOMContentLoaded', function() {
             generateQRCode();
+            
+            // Detecta e força modo standalone
+            checkStandaloneMode();
         });
+
+        // === STANDALONE MODE DETECTION ===
+        function checkStandaloneMode() {
+            const isStandaloneMode = window.navigator.standalone || 
+                                   window.matchMedia('(display-mode: standalone)').matches ||
+                                   window.matchMedia('(display-mode: fullscreen)').matches ||
+                                   window.matchMedia('(display-mode: minimal-ui)').matches;
+            
+            if (isStandaloneMode) {
+                console.log('PWA: Running in TRUE standalone mode');
+                document.body.classList.add('standalone-mode');
+                
+                // Esconde elementos do navegador se existirem
+                hideNavigationElements();
+                
+                // Adiciona comportamentos específicos de app
+                enableAppBehaviors();
+                
+                // Notifica que é um app real
+                setTimeout(() => {
+                    if (!localStorage.getItem('standaloneWelcomeShown')) {
+                        showAchievement('🎃 Bem-vindo ao WYD Quest Tracker! 📱 App instalado com sucesso!', 'install-success');
+                        localStorage.setItem('standaloneWelcomeShown', 'true');
+                    }
+                }, 2000);
+            } else {
+                console.log('PWA: Running in browser mode');
+                document.body.classList.add('browser-mode');
+            }
+            
+            // Força atualizações de modo standalone
+            window.addEventListener('resize', () => {
+                const currentMode = window.matchMedia('(display-mode: standalone)').matches;
+                if (currentMode !== isStandaloneMode) {
+                    location.reload();
+                }
+            });
+        }
+
+        function hideNavigationElements() {
+            // Esconde barras de navegação do navegador se possível
+            if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+                // Não forçar fullscreen automático, mas preparar interface
+                document.body.style.paddingTop = '0';
+            }
+        }
+
+        function enableAppBehaviors() {
+            // Previne zoom indesejado
+            document.addEventListener('touchstart', function(e) {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            });
+            
+            // Previne seleção de texto acidental
+            document.addEventListener('selectstart', function(e) {
+                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                }
+            });
+            
+            // Melhora performance em modo app
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(() => {
+                    console.log('PWA: App optimizations enabled');
+                });
+            }
+        }
 
         // === PWA INSTALLATION SYSTEM ===
         let deferredPrompt;
         const installButton = document.getElementById('installPWABtn');
         const iosInstallBanner = document.getElementById('iosInstallBanner');
+        const universalInstallBanner = document.getElementById('universalInstallBanner');
 
         // Detecta se é iOS
         function isIOS() {
@@ -1607,11 +1893,21 @@
             return /Android/.test(navigator.userAgent) && /Chrome/.test(navigator.userAgent);
         }
 
+        // Detecta se é mobile
+        function isMobile() {
+            return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
         // Detecta se o app já está instalado
         function isStandalone() {
             return window.navigator.standalone === true || 
                    window.matchMedia('(display-mode: standalone)').matches ||
                    window.matchMedia('(display-mode: fullscreen)').matches;
+        }
+
+        // Detecta se suporta PWA
+        function supportsPWA() {
+            return 'serviceWorker' in navigator && 'PushManager' in window;
         }
 
         // Event listener para beforeinstallprompt
@@ -1622,9 +1918,16 @@
             
             // Mostra o botão de instalação apenas se não estiver instalado
             if (!isStandalone()) {
-                installButton.classList.add('show');
+                showInstallButton();
             }
         });
+
+        // Mostra botão de instalação
+        function showInstallButton() {
+            installButton.classList.add('show');
+            // Esconde banners se o botão apareceu
+            hideAllBanners();
+        }
 
         // Click no botão de instalação
         installButton.addEventListener('click', async () => {
@@ -1644,17 +1947,46 @@
             
             if (outcome === 'accepted') {
                 console.log('PWA: User accepted the install prompt');
-                showAchievement('App instalado com sucesso! 🎉', 'install-success');
-                installButton.classList.remove('show');
+                showAchievement('🎃 App instalado com sucesso! 📱✨', 'install-success');
+                hideInstallElements();
             }
             
             deferredPrompt = null;
         });
 
+        // Esconde todos os elementos de instalação
+        function hideInstallElements() {
+            installButton.classList.remove('show');
+            hideAllBanners();
+        }
+
+        // Esconde todos os banners
+        function hideAllBanners() {
+            iosInstallBanner.classList.remove('show');
+            universalInstallBanner.classList.remove('show');
+        }
+
         // Mostra banner de instalação iOS
         function showIOSInstallBanner() {
             if (!localStorage.getItem('iosInstallBannerDismissed')) {
+                hideAllBanners();
                 iosInstallBanner.classList.add('show');
+            }
+        }
+
+        // Mostra banner universal
+        function showUniversalInstallBanner() {
+            if (!localStorage.getItem('universalInstallBannerDismissed')) {
+                hideAllBanners();
+                universalInstallBanner.classList.add('show');
+                
+                // Adiciona listener para clique no banner
+                universalInstallBanner.addEventListener('click', function(e) {
+                    if (!e.target.classList.contains('close-banner')) {
+                        // Simula clique no botão de instalação
+                        installButton.click();
+                    }
+                });
             }
         }
 
@@ -1664,16 +1996,22 @@
             localStorage.setItem('iosInstallBannerDismissed', 'true');
         }
 
+        // Fecha banner universal
+        function closeUniversalBanner() {
+            universalInstallBanner.classList.remove('show');
+            localStorage.setItem('universalInstallBannerDismissed', 'true');
+        }
+
         // Mostra instruções gerais de instalação
         function showInstallInstructions() {
             let instructions = '';
             
             if (isAndroidChrome()) {
-                instructions = 'Para instalar: Menu (⋮) → "Adicionar à tela inicial" ou "Instalar app"';
+                instructions = '📱 Para instalar: Menu (⋮) → "Adicionar à tela inicial" ou "Instalar app"';
             } else if (isIOS()) {
-                instructions = 'Para instalar: Toque em Compartilhar (↗) → "Adicionar à Tela de Início"';
+                instructions = '📱 Para instalar: Toque em Compartilhar (↗️) → "Adicionar à Tela de Início"';
             } else {
-                instructions = 'Para instalar: Procure pela opção "Instalar" ou "Adicionar à tela inicial" no menu do seu navegador';
+                instructions = '📱 Para instalar: Procure pela opção "Instalar" ou "Adicionar à tela inicial" no menu do seu navegador';
             }
             
             showAchievement(instructions, 'info');
@@ -1682,23 +2020,49 @@
         // Detecta quando o app é instalado
         window.addEventListener('appinstalled', (evt) => {
             console.log('PWA: App was installed');
-            showAchievement('WYD Quest Tracker instalado! 📱✨', 'install-success');
-            installButton.classList.remove('show');
-            closeIOSBanner();
+            showAchievement('🎃 WYD Quest Tracker instalado! 📱✨', 'install-success');
+            hideInstallElements();
         });
 
         // Verifica o estado inicial
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
+                // Se já está instalado, não mostra nada
+                if (isStandalone()) {
+                    return;
+                }
+
                 // Se não está instalado e não há prompt nativo
-                if (!isStandalone() && !deferredPrompt) {
-                    if (isIOS() && !localStorage.getItem('iosInstallBannerDismissed')) {
-                        // Mostra banner iOS após um tempo
-                        setTimeout(showIOSInstallBanner, 3000);
-                    } else if (!isIOS()) {
+                if (!deferredPrompt) {
+                // Se não está instalado e não há prompt nativo
+                if (!deferredPrompt) {
+                    if (isIOS()) {
+                        // Mostra banner iOS específico após um tempo
+                        if (!localStorage.getItem('iosInstallBannerDismissed')) {
+                            setTimeout(showIOSInstallBanner, 3000);
+                        }
+                    } else if (isMobile() && supportsPWA()) {
+                        // Mostra banner universal para mobile
+                        if (!localStorage.getItem('universalInstallBannerDismissed')) {
+                            setTimeout(showUniversalInstallBanner, 2000);
+                        }
+                        // E também mostra o botão depois
+                        setTimeout(() => {
+                            if (!installButton.classList.contains('show')) {
+                                installButton.classList.add('show');
+                            }
+                        }, 5000);
+                    } else {
                         // Mostra botão de instalação para outros dispositivos
-                        installButton.classList.add('show');
+                        setTimeout(() => {
+                            installButton.classList.add('show');
+                        }, 3000);
                     }
+                } else {
+                    // Se há prompt nativo disponível, prioriza o botão
+                    setTimeout(() => {
+                        installButton.classList.add('show');
+                    }, 1000);
                 }
             }, 2000);
         });
