@@ -1,15 +1,19 @@
 {
-  "name": "WYD Quest Tracker",
+  "name": "WYD Quest Tracker - Rastreador de Missões",
   "short_name": "WYD Tracker",
-  "description": "Acompanhe suas missões diárias do WYD com notificações de arena",
-  "start_url": "./index.html",
+  "description": "Acompanhe suas missões diárias do WYD com notificações de arena em tempo real",
+  "start_url": "./index.html?source=pwa",
+  "id": "wyd-quest-tracker",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "minimal-ui"],
   "background_color": "#1f1f1f",
   "theme_color": "#e67e22",
   "orientation": "portrait-primary",
   "scope": "./",
   "lang": "pt-BR",
-  "categories": ["games", "productivity"],
+  "dir": "ltr",
+  "categories": ["games", "productivity", "utilities"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "icon-72x72.png",
@@ -36,13 +40,35 @@
       "purpose": "any"
     }
   ],
+  "screenshots": [
+    {
+      "src": "screenshot-mobile.png",
+      "sizes": "320x640",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
   "shortcuts": [
     {
       "name": "Ver Arenas",
       "short_name": "Arenas",
-      "description": "Verificar horários das arenas",
-      "url": "./index.html",
-      "icons": [{ "src": "icon-192x192.png", "sizes": "192x192" }]
+      "description": "Verificar horários das arenas PvP",
+      "url": "./index.html#arenas",
+      "icons": [{ "src": "icon-72x72.png", "sizes": "72x72" }]
+    },
+    {
+      "name": "Quest Diárias",
+      "short_name": "Quests",
+      "description": "Marcar quests diárias completas",
+      "url": "./index.html#quests",
+      "icons": [{ "src": "icon-72x72.png", "sizes": "72x72" }]
     }
-  ]
+  ],
+  "related_applications": [],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "protocol_handlers": [],
+  "file_handlers": [],
+  "handle_links": "preferred"
 }

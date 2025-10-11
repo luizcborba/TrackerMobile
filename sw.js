@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wyd-quest-tracker-v1.0.0';
+const CACHE_NAME = 'wyd-quest-tracker-v3.0';
 const urlsToCache = [
   './',
   './index.html',
