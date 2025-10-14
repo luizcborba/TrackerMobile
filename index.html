@@ -1133,11 +1133,12 @@
 
             <div class="quest-item multi-quest" data-quest="caca">
                 <div class="quest-subchecks-container">
-                    <div class="quest-subcheck" data-subquest="caca-1"></div>
-                    <div class="quest-subcheck" data-subquest="caca-2"></div>
+                    <div class="quest-subcheck" data-subquest="caca-1" title="Dragões"></div>
+                    <div class="quest-subcheck" data-subquest="caca-2" title="Agmons"></div>
+                    <div class="quest-subcheck" data-subquest="caca-3" title="Boss"></div>
                 </div>
                 <div class="quest-info">
-                    <div class="quest-name" id="caca-title">Dragonfield (0/2)</div>
+                    <div class="quest-name" id="caca-title">Dragonfield (0/3)</div>
                 </div>
             </div>
 
@@ -1766,10 +1767,10 @@
             }
             
             // Atualiza contador do Dragonfield
-            const cacaCompleted = ['caca-1', 'caca-2'].filter(id => data.subquests[id]).length;
+            const cacaCompleted = ['caca-1', 'caca-2', 'caca-3'].filter(id => data.subquests[id]).length;
             const cacaElement = document.getElementById('caca-title');
             if (cacaElement) {
-                cacaElement.textContent = `Dragonfield (${cacaCompleted}/2)`;
+                cacaElement.textContent = `Dragonfield (${cacaCompleted}/3)`;
             }
         }
 
