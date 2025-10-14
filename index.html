@@ -612,6 +612,194 @@
             font-style: italic;
         }
 
+        /* === SEÇÃO DE CONFIGURAÇÕES === */
+        .settings-section {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(230, 126, 34, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .settings-title {
+            color: #e67e22;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(230, 126, 34, 0.2);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-info {
+            flex: 1;
+        }
+
+        .setting-name {
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .setting-description {
+            color: #ccc;
+            font-size: 0.85em;
+            line-height: 1.3;
+        }
+
+        /* Toggle Switch */
+        .setting-toggle {
+            margin-left: 15px;
+        }
+
+        .toggle-checkbox {
+            display: none;
+        }
+
+        .toggle-label {
+            display: block;
+            width: 50px;
+            height: 26px;
+            background: #444;
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(230, 126, 34, 0.3);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: #999;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-checkbox:checked + .toggle-label {
+            background: #e67e22;
+            border-color: #f39c12;
+            box-shadow: 0 0 10px rgba(230, 126, 34, 0.5);
+        }
+
+        .toggle-checkbox:checked + .toggle-label .toggle-slider {
+            transform: translateX(24px);
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .toggle-label:hover {
+            box-shadow: 0 0 15px rgba(230, 126, 34, 0.3);
+        }
+
+        /* Animação quando toggle é ativado */
+        .toggle-checkbox:checked + .toggle-label {
+            animation: toggle-success 0.6s ease-out;
+        }
+
+        @keyframes toggle-success {
+            0% { 
+                transform: scale(1);
+                box-shadow: 0 0 10px rgba(230, 126, 34, 0.5);
+            }
+            50% { 
+                transform: scale(1.1);
+                box-shadow: 0 0 20px rgba(230, 126, 34, 0.8);
+            }
+            100% { 
+                transform: scale(1);
+                box-shadow: 0 0 10px rgba(230, 126, 34, 0.5);
+            }
+        }
+
+        /* Status visual das configurações */
+        .setting-item.disabled {
+            opacity: 0.5;
+        }
+
+        .setting-item.disabled .setting-name,
+        .setting-item.disabled .setting-description {
+            color: #666;
+        }
+
+        /* Botão de Permissão */
+        .permission-btn {
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(230, 126, 34, 0.3);
+        }
+
+        .permission-btn:hover {
+            background: linear-gradient(135deg, #d35400, #e67e22);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(230, 126, 34, 0.4);
+        }
+
+        .permission-btn:active {
+            transform: translateY(0);
+        }
+
+        .permission-btn.granted {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            cursor: default;
+        }
+
+        .permission-btn.denied {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            cursor: not-allowed;
+        }
+
+        /* Status da Permissão */
+        .permission-status {
+            font-size: 0.75em;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .permission-status.granted {
+            background: rgba(39, 174, 96, 0.2);
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+
+        .permission-status.denied {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+
+        .permission-status.default {
+            background: rgba(230, 126, 34, 0.2);
+            color: #e67e22;
+            border: 1px solid rgba(230, 126, 34, 0.3);
+        }
+
         /* Botão de Instalação PWA */
         .install-pwa-button {
             position: fixed;
@@ -939,14 +1127,17 @@
             <div class="quest-item" data-quest="deserto">
                 <div class="quest-checkbox"></div>
                 <div class="quest-info">
-                    <div class="quest-name">Deserto de Loran</div>
+                    <div class="quest-name">Deserto Desconhecido</div>
                 </div>
             </div>
 
             <div class="quest-item" data-quest="caca">
-                <div class="quest-checkbox"></div>
+                <div class="quest-checkbox">
+                    <div class="quest-subcheck" data-subquest="caca-1"></div>
+                    <div class="quest-subcheck" data-subquest="caca-2"></div>
+                </div>
                 <div class="quest-info">
-                    <div class="quest-name">Caça aos Monstros</div>
+                    <div class="quest-name" id="caca-title">Dragonfield (0/2)</div>
                 </div>
             </div>
 
@@ -1041,6 +1232,39 @@
                 Reset diário em: <strong id="resetTimer">00:00:00</strong>
             </div>
 
+            <!-- Seção de Configurações -->
+            <div class="settings-section">
+                <div class="settings-title">
+                    ⚙️ Configurações
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-name">🔔 Notificações de Arena/Evento</div>
+                        <div class="setting-description">Receba avisos sonoros nos horários das arenas e eventos</div>
+                    </div>
+                    <div class="setting-toggle">
+                        <input type="checkbox" id="notificationToggle" class="toggle-checkbox" checked>
+                        <label for="notificationToggle" class="toggle-label">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-name">📱 Notificações Push Mobile</div>
+                        <div class="setting-description">Receba notificações mesmo com o app fechado (requer permissão)</div>
+                        <div class="permission-status" id="permissionStatus">🔒 Permissão necessária</div>
+                    </div>
+                    <div class="setting-toggle">
+                        <button id="requestPermissionBtn" class="permission-btn">
+                            🔓 Permitir
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Seção de Doação -->
             <div class="donation-section">
                 <div class="donation-title">
@@ -1085,7 +1309,9 @@
             lastCompletedDate: null,
             theme: 'dark',
             notifiedQuests: {},
-            notificationInterval: null
+            notificationInterval: null,
+            notificationsEnabled: true,
+            pushPermissionGranted: false
         };
 
         // Sistema de notificação sonora
@@ -1151,6 +1377,11 @@
         }
 
         function checkQuestNotifications() {
+            // Verifica se notificações estão habilitadas
+            if (!data.notificationsEnabled) {
+                return;
+            }
+            
             const now = new Date();
             const currentHour = now.getHours();
             const currentMinute = now.getMinutes();
@@ -1200,10 +1431,238 @@
                 checkDailyReset();
                 updateUI();
             }
+            
+            // Carrega configuração de notificações
+            updateNotificationToggle();
+            
+            // Verifica permissões de notificação
+            setTimeout(() => {
+                updatePermissionStatus();
+            }, 1000);
         }
 
         function saveData() {
             localStorage.setItem('wydQuestData', JSON.stringify(data));
+        }
+
+        // === CONTROLE DE NOTIFICAÇÕES ===
+        function updateNotificationToggle() {
+            const toggle = document.getElementById('notificationToggle');
+            if (toggle) {
+                toggle.checked = data.notificationsEnabled;
+            }
+        }
+
+        function setupNotificationToggle() {
+            const toggle = document.getElementById('notificationToggle');
+            if (toggle) {
+                toggle.addEventListener('change', function() {
+                    data.notificationsEnabled = this.checked;
+                    saveData();
+                    
+                    if (this.checked) {
+                        showAchievement('🔔 Notificações ativadas! Você receberá avisos de arena/evento', 'notification-on');
+                    } else {
+                        showAchievement('🔕 Notificações desativadas. Você não receberá mais avisos', 'notification-off');
+                        // Para qualquer notificação ativa
+                        stopNotificationLoop();
+                        hideNotification();
+                    }
+                });
+            }
+            
+            // Configura botão de permissão push
+            setupPushNotifications();
+        }
+
+        // === NOTIFICAÇÕES PUSH MOBILE ===
+        async function setupPushNotifications() {
+            updatePermissionStatus();
+            
+            const permissionBtn = document.getElementById('requestPermissionBtn');
+            if (permissionBtn) {
+                permissionBtn.addEventListener('click', requestNotificationPermission);
+            }
+        }
+
+        function updatePermissionStatus() {
+            const statusElement = document.getElementById('permissionStatus');
+            const permissionBtn = document.getElementById('requestPermissionBtn');
+            
+            if (!('Notification' in window)) {
+                statusElement.textContent = '❌ Não suportado neste navegador';
+                statusElement.className = 'permission-status denied';
+                permissionBtn.textContent = '❌ Não disponível';
+                permissionBtn.className = 'permission-btn denied';
+                permissionBtn.disabled = true;
+                return;
+            }
+            
+            const permission = Notification.permission;
+            
+            switch (permission) {
+                case 'granted':
+                    statusElement.textContent = '✅ Permissão concedida';
+                    statusElement.className = 'permission-status granted';
+                    permissionBtn.textContent = '✅ Ativadas';
+                    permissionBtn.className = 'permission-btn granted';
+                    permissionBtn.disabled = true;
+                    data.pushPermissionGranted = true;
+                    scheduleNextNotifications();
+                    break;
+                    
+                case 'denied':
+                    statusElement.textContent = '❌ Permissão negada';
+                    statusElement.className = 'permission-status denied';
+                    permissionBtn.textContent = '❌ Bloqueadas';
+                    permissionBtn.className = 'permission-btn denied';
+                    permissionBtn.disabled = true;
+                    data.pushPermissionGranted = false;
+                    break;
+                    
+                default: // 'default'
+                    statusElement.textContent = '🔒 Permissão necessária';
+                    statusElement.className = 'permission-status default';
+                    permissionBtn.textContent = '🔓 Permitir';
+                    permissionBtn.className = 'permission-btn';
+                    permissionBtn.disabled = false;
+                    data.pushPermissionGranted = false;
+                    break;
+            }
+            
+            saveData();
+        }
+
+        async function requestNotificationPermission() {
+            if (!('Notification' in window)) {
+                showAchievement('❌ Seu navegador não suporta notificações push', 'error');
+                return;
+            }
+            
+            try {
+                const permission = await Notification.requestPermission();
+                
+                if (permission === 'granted') {
+                    showAchievement('🎉 Permissão concedida! Agora você receberá notificações mesmo com o app fechado! 📱', 'success');
+                    
+                    // Registra service worker se ainda não estiver
+                    if ('serviceWorker' in navigator) {
+                        const registration = await navigator.serviceWorker.ready;
+                        console.log('Service Worker registrado para notificações push');
+                    }
+                    
+                } else if (permission === 'denied') {
+                    showAchievement('❌ Permissão negada. Você pode alterar isso nas configurações do navegador.', 'error');
+                } else {
+                    showAchievement('⚠️ Permissão não concedida. Tente novamente se quiser receber notificações.', 'warning');
+                }
+                
+                updatePermissionStatus();
+                
+            } catch (error) {
+                console.error('Erro ao solicitar permissão:', error);
+                showAchievement('❌ Erro ao solicitar permissão. Tente novamente.', 'error');
+            }
+        }
+
+        // Agenda próximas notificações
+        function scheduleNextNotifications() {
+            if (!data.pushPermissionGranted || !data.notificationsEnabled) {
+                return;
+            }
+            
+            const now = new Date();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            
+            questSchedule.forEach(quest => {
+                const questTime = quest.hour * 60 + quest.minute;
+                const notifyTime = questTime - 5; // 5 minutos antes
+                
+                // Se o horário de notificação ainda não passou hoje
+                if (currentTime < notifyTime) {
+                    const timeUntilNotification = (notifyTime - currentTime) * 60 * 1000; // em millisegundos
+                    
+                    setTimeout(() => {
+                        sendPushNotification(quest);
+                    }, timeUntilNotification);
+                    
+                    console.log(`📅 Notificação agendada para ${quest.name} em ${Math.round(timeUntilNotification / 60000)} minutos`);
+                }
+            });
+        }
+
+        // Envia notificação push
+        function sendPushNotification(quest) {
+            if (!data.pushPermissionGranted || !data.notificationsEnabled) {
+                return;
+            }
+            
+            const now = new Date();
+            const questTime = quest.hour * 60 + quest.minute;
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            
+            let title, body, icon;
+            
+            if (currentTime < questTime) {
+                const minutesLeft = questTime - currentTime;
+                title = '🎃 WYD Quest Tracker 👻';
+                body = `⏰ ${quest.name} começa em ${minutesLeft} minuto${minutesLeft > 1 ? 's' : ''}!`;
+                icon = './icon-192x192.png';
+            } else {
+                title = '🚨 WYD Quest Tracker';
+                body = `⚔️ ${quest.name} está começando AGORA!`;
+                icon = './icon-192x192.png';
+            }
+            
+            // Cria notificação nativa
+            const notification = new Notification(title, {
+                body: body,
+                icon: icon,
+                badge: './icon-72x72.png',
+                tag: quest.id,
+                requireInteraction: true,
+                silent: false,
+                vibrate: [200, 100, 200, 100, 200],
+                actions: [
+                    {
+                        action: 'open',
+                        title: '🎮 Abrir App',
+                        icon: './icon-72x72.png'
+                    },
+                    {
+                        action: 'close',
+                        title: '❌ Fechar',
+                        icon: './icon-72x72.png'
+                    }
+                ],
+                data: {
+                    quest: quest,
+                    timestamp: Date.now()
+                }
+            });
+            
+            notification.onclick = function() {
+                window.focus();
+                this.close();
+            };
+            
+            // Auto-fecha após 30 segundos
+            setTimeout(() => {
+                notification.close();
+            }, 30000);
+            
+            console.log(`📱 Notificação push enviada: ${quest.name}`);
+        }
+
+        function hideNotification() {
+            const popup = document.getElementById('achievementPopup');
+            const closeBtn = document.getElementById('notificationClose');
+            
+            if (popup.classList.contains('persistent')) {
+                popup.classList.remove('show', 'persistent');
+                popup.style.animation = '';
+                closeBtn.style.display = 'none';
+            }
         }
 
         function checkDailyReset() {
@@ -1304,6 +1763,13 @@
             const infernalElement = document.getElementById('infernal-title');
             if (infernalElement) {
                 infernalElement.textContent = `Infernal (${infernalCompleted}/2)`;
+            }
+            
+            // Atualiza contador do Dragonfield
+            const cacaCompleted = ['caca-1', 'caca-2'].filter(id => data.subquests[id]).length;
+            const cacaElement = document.getElementById('caca-title');
+            if (cacaElement) {
+                cacaElement.textContent = `Dragonfield (${cacaCompleted}/2)`;
             }
         }
 
@@ -1706,6 +2172,12 @@
         // Gera o QR code quando a página carrega
         document.addEventListener('DOMContentLoaded', function() {
             generateQRCode();
+            setupNotificationToggle();
+            
+            // Inicializa notificações push após um pequeno delay
+            setTimeout(() => {
+                scheduleNextNotifications();
+            }, 2000);
         });
 
         // === PWA INSTALLATION SYSTEM ===

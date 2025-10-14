@@ -98,28 +98,33 @@ self.addEventListener('push', function(event) {
   if (event.data) {
     const data = event.data.json();
     const options = {
-      body: data.body || 'Nova notificação do WYD Quest Tracker',
+      body: data.body || '🎃 Nova notificação do WYD Quest Tracker! 👻',
       icon: './icon-192x192.png',
-      badge: './icon-192x192.png',
-      vibrate: [200, 100, 200],
+      badge: './icon-72x72.png',
+      vibrate: [200, 100, 200, 100, 200],
       tag: 'wyd-quest',
       requireInteraction: true,
+      silent: false,
       actions: [
         {
-          action: 'confirm',
-          title: '✅ Confirmar',
-          icon: './icon-192x192.png'
+          action: 'open',
+          title: '🎮 Abrir App',
+          icon: './icon-72x72.png'
         },
         {
-          action: 'dismiss',
-          title: '❌ Descartar',
-          icon: './icon-192x192.png'
+          action: 'close',
+          title: '❌ Fechar',
+          icon: './icon-72x72.png'
         }
-      ]
+      ],
+      data: {
+        url: './index.html?source=notification',
+        timestamp: Date.now()
+      }
     };
 
     event.waitUntil(
-      self.registration.showNotification(data.title || 'WYD Quest Tracker', options)
+      self.registration.showNotification(data.title || '🎃 WYD Quest Tracker 👻', options)
     );
   }
 });
@@ -129,15 +134,164 @@ self.addEventListener('notificationclick', function(event) {
   console.log('Service Worker: Clique na notificação:', event.action);
   event.notification.close();
 
-  if (event.action === 'confirm') {
+  if (event.action === 'open' || !event.action) {
     event.waitUntil(
-      clients.openWindow('./')
-    );
-  } else if (event.action === 'dismiss') {
-    console.log('Notificação descartada');
-  } else {
-    event.waitUntil(
-      clients.openWindow('./')
+      clients.matchAll({
+        type: 'window',
+        includeUncontrolled: true
+      }).then(function(clientList) {
+        // Procura por janela já aberta
+        for (let i = 0; i < clientList.length; i++) {
+          const client = clientList[i];
+          if (client.url.includes('index.html') && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        // Se não há janela aberta, abre nova
+        if (clients.openWindow) {
+          return clients.openWindow('./index.html?source=notification');
+        }
+      })
     );
   }
 });
+
+// === SISTEMA DE NOTIFICAÇÕES LOCAIS ===
+// Agenda próximas notificações quando o service worker ativa
+self.addEventListener('activate', function(event) {
+  console.log('Service Worker: Ativando...');
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Service Worker: Removendo cache antigo:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => {
+      console.log('Service Worker: Ativado');
+      
+      // Agenda notificações locais
+      scheduleQuestNotifications();
+      
+      return self.clients.claim();
+    })
+  );
+});
+
+// Horários das arenas e eventos
+const questSchedule = [
+  { id: 'arena1', name: 'Arena 13:00', hour: 13, minute: 0 },
+  { id: 'arena2', name: 'Arena 19:00', hour: 19, minute: 0 },
+  { id: 'arena3', name: 'Arena 20:30', hour: 20, minute: 30 },
+  { id: 'arena4', name: 'Arena 23:00', hour: 23, minute: 0 },
+  { id: 'evento1', name: 'Evento 11:00', hour: 11, minute: 0 },
+  { id: 'evento2', name: 'Evento 15:00', hour: 15, minute: 0 },
+  { id: 'evento3', name: 'Evento 18:00', hour: 18, minute: 0 },
+  { id: 'evento4', name: 'Evento 22:00', hour: 22, minute: 0 }
+];
+
+function scheduleQuestNotifications() {
+  console.log('Service Worker: Agendando notificações...');
+  
+  // Limpa timers anteriores
+  if (self.questTimers) {
+    self.questTimers.forEach(timer => clearTimeout(timer));
+  }
+  self.questTimers = [];
+  
+  const now = new Date();
+  const currentTime = now.getHours() * 60 + now.getMinutes();
+  
+  questSchedule.forEach(quest => {
+    const questTime = quest.hour * 60 + quest.minute;
+    
+    // Agenda para hoje se ainda não passou
+    scheduleNotificationForTime(quest, questTime, now);
+    
+    // Agenda para amanhã
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    scheduleNotificationForTime(quest, questTime, tomorrow);
+  });
+}
+
+function scheduleNotificationForTime(quest, questTime, targetDate) {
+  const notifyTime = questTime - 5; // 5 minutos antes
+  const notifyDate = new Date(targetDate);
+  notifyDate.setHours(Math.floor(notifyTime / 60), notifyTime % 60, 0, 0);
+  
+  const now = new Date();
+  const timeUntilNotification = notifyDate.getTime() - now.getTime();
+  
+  // Só agenda se for no futuro
+  if (timeUntilNotification > 0) {
+    const timer = setTimeout(() => {
+      showQuestNotification(quest);
+    }, timeUntilNotification);
+    
+    self.questTimers.push(timer);
+    
+    console.log(`SW: ${quest.name} agendado para ${notifyDate.toLocaleString()} (em ${Math.round(timeUntilNotification / 60000)} min)`);
+  }
+}
+
+function showQuestNotification(quest) {
+  console.log(`SW: Mostrando notificação para ${quest.name}`);
+  
+  const now = new Date();
+  const questTime = quest.hour * 60 + quest.minute;
+  const currentTime = now.getHours() * 60 + now.getMinutes();
+  
+  let title, body;
+  
+  if (currentTime < questTime) {
+    const minutesLeft = questTime - currentTime;
+    title = '⏰ WYD Quest Tracker';
+    body = `🎃 ${quest.name} começa em ${minutesLeft} minuto${minutesLeft > 1 ? 's' : ''}! 👻`;
+  } else {
+    title = '🚨 WYD Quest Tracker';
+    body = `⚔️ ${quest.name} está começando AGORA! 🏆`;
+  }
+  
+  const options = {
+    body: body,
+    icon: './icon-192x192.png',
+    badge: './icon-72x72.png',
+    tag: quest.id + '_' + Date.now(),
+    requireInteraction: true,
+    silent: false,
+    vibrate: [200, 100, 200, 100, 200, 100, 200],
+    actions: [
+      {
+        action: 'open',
+        title: '🎮 Abrir WYD Tracker',
+        icon: './icon-72x72.png'
+      },
+      {
+        action: 'dismiss',
+        title: '❌ Dispensar',
+        icon: './icon-72x72.png'
+      }
+    ],
+    data: {
+      quest: quest,
+      timestamp: Date.now(),
+      url: './index.html?source=notification&quest=' + quest.id
+    }
+  };
+  
+  self.registration.showNotification(title, options);
+}
+
+// Reagenda notificações diariamente
+setInterval(() => {
+  const now = new Date();
+  // Reagenda às 00:01 de cada dia
+  if (now.getHours() === 0 && now.getMinutes() === 1) {
+    console.log('Service Worker: Reagendando notificações para novo dia');
+    scheduleQuestNotifications();
+  }
+}, 60000); // Verifica a cada minuto
