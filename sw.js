@@ -187,10 +187,16 @@ const questSchedule = [
   { id: 'arena2', name: 'Arena 19:00', hour: 19, minute: 0 },
   { id: 'arena3', name: 'Arena 20:30', hour: 20, minute: 30 },
   { id: 'arena4', name: 'Arena 23:00', hour: 23, minute: 0 },
-  { id: 'evento1', name: 'Evento 11:00', hour: 11, minute: 0 },
-  { id: 'evento2', name: 'Evento 15:00', hour: 15, minute: 0 },
-  { id: 'evento3', name: 'Evento 18:00', hour: 18, minute: 0 },
-  { id: 'evento4', name: 'Evento 22:00', hour: 22, minute: 0 }
+  { id: 'evento1', name: 'Evento Halloween 11:00', hour: 11, minute: 0 },
+  { id: 'evento2', name: 'Evento Halloween 15:00', hour: 15, minute: 0 },
+  { id: 'evento3', name: 'Evento Halloween 18:00', hour: 18, minute: 0 },
+  { id: 'evento4', name: 'Evento Halloween 22:00', hour: 22, minute: 0 },
+  { id: 'teleporte1', name: 'Evento Teleporte 12:00', hour: 12, minute: 0 },
+  { id: 'teleporte2', name: 'Evento Teleporte 20:00', hour: 20, minute: 0 },
+  { id: 'teleporte3', name: 'Evento Teleporte Sábado 10:00', hour: 10, minute: 0, days: [6] }, // Sábado
+  { id: 'teleporte4', name: 'Evento Teleporte Sábado 14:00', hour: 14, minute: 0, days: [6] }, // Sábado
+  { id: 'teleporte5', name: 'Evento Teleporte Domingo 16:00', hour: 16, minute: 0, days: [0] }, // Domingo
+  { id: 'teleporte6', name: 'Evento Teleporte Domingo 21:00', hour: 21, minute: 0, days: [0] }  // Domingo
 ];
 
 function scheduleQuestNotifications() {
@@ -208,13 +214,26 @@ function scheduleQuestNotifications() {
   questSchedule.forEach(quest => {
     const questTime = quest.hour * 60 + quest.minute;
     
-    // Agenda para hoje se ainda não passou
-    scheduleNotificationForTime(quest, questTime, now);
-    
-    // Agenda para amanhã
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    scheduleNotificationForTime(quest, questTime, tomorrow);
+    // Verifica se o evento tem restrição de dias
+    if (quest.days) {
+      // Agenda para os próximos 7 dias
+      for (let i = 0; i < 7; i++) {
+        const checkDate = new Date(now);
+        checkDate.setDate(checkDate.getDate() + i);
+        
+        if (quest.days.includes(checkDate.getDay())) {
+          scheduleNotificationForTime(quest, questTime, checkDate);
+        }
+      }
+    } else {
+      // Agenda para hoje se ainda não passou
+      scheduleNotificationForTime(quest, questTime, now);
+      
+      // Agenda para amanhã
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      scheduleNotificationForTime(quest, questTime, tomorrow);
+    }
   });
 }
 

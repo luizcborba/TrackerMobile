@@ -368,6 +368,121 @@
             color: #9b59b6;
         }
 
+        /* Tag Halloween */
+        .halloween-tag {
+            background: linear-gradient(135deg, rgba(255, 140, 0, 0.3), rgba(230, 126, 34, 0.3)) !important;
+            border: 1px solid #ff8c00 !important;
+            color: #ff8c00 !important;
+            animation: halloween-glow 2s ease-in-out infinite;
+            box-shadow: 0 0 8px rgba(255, 140, 0, 0.3);
+        }
+
+        @keyframes halloween-glow {
+            0%, 100% { 
+                box-shadow: 0 0 8px rgba(255, 140, 0, 0.3);
+            }
+            50% { 
+                box-shadow: 0 0 15px rgba(255, 140, 0, 0.6);
+            }
+        }
+
+        /* Tag Teleporte */
+        .teleporte-tag {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(147, 112, 219, 0.3)) !important;
+            border: 1px solid #9370db !important;
+            color: #dda0dd !important;
+            animation: teleporte-glow 2s ease-in-out infinite;
+            box-shadow: 0 0 8px rgba(138, 43, 226, 0.3);
+        }
+
+        @keyframes teleporte-glow {
+            0%, 100% { 
+                box-shadow: 0 0 8px rgba(138, 43, 226, 0.3);
+            }
+            50% { 
+                box-shadow: 0 0 15px rgba(138, 43, 226, 0.6);
+            }
+        }
+
+        /* === DROPDOWNS DE QUESTS === */
+        .quest-dropdown {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(230, 126, 34, 0.3);
+            border-radius: 12px;
+            margin: 8px 0;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .quest-dropdown:hover {
+            border-color: rgba(230, 126, 34, 0.5);
+            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.2);
+        }
+
+        .quest-dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            cursor: pointer;
+            background: rgba(230, 126, 34, 0.1);
+            border-bottom: 1px solid rgba(230, 126, 34, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .quest-dropdown-header:hover {
+            background: rgba(230, 126, 34, 0.2);
+        }
+
+        .quest-dropdown-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #e67e22;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .quest-dropdown-arrow {
+            font-size: 1.2em;
+            color: #e67e22;
+            transition: transform 0.3s ease;
+            user-select: none;
+        }
+
+        .quest-dropdown-arrow.rotated {
+            transform: rotate(180deg);
+        }
+
+        .quest-dropdown-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .quest-dropdown-content.open {
+            max-height: 500px;
+        }
+
+        .quest-dropdown-content .quest-item {
+            margin: 0;
+            border-radius: 0;
+            border: none;
+            border-bottom: 1px solid rgba(230, 126, 34, 0.1);
+            background: transparent;
+        }
+
+        .quest-dropdown-content .quest-item:last-child {
+            border-bottom: none;
+        }
+
+        .quest-dropdown-content .quest-item:hover {
+            background: rgba(230, 126, 34, 0.1);
+        }
+
         .quest-description {
             color: #999;
             font-size: 0.85em;
@@ -1149,82 +1264,165 @@
                 </div>
             </div>
 
-            <div class="quest-item" data-quest="arena1">
-                <div class="quest-checkbox"></div>
-                <div class="quest-info">
-                    <div class="quest-name">
-                        Arena 13:00
+            <!-- Dropdown de Arenas -->
+            <div class="quest-dropdown">
+                <div class="quest-dropdown-header" onclick="toggleDropdown('arenas-dropdown')">
+                    <div class="quest-dropdown-title">
+                        ⚔️ Arenas PvP
                         <span class="quest-tag">PVP</span>
                     </div>
+                    <div class="quest-dropdown-arrow" id="arenas-arrow">▼</div>
                 </div>
-            </div>
+                <div class="quest-dropdown-content" id="arenas-dropdown">
+                    <div class="quest-item" data-quest="arena1">
+                        <div class="quest-checkbox"></div>
+                        <div class="quest-info">
+                            <div class="quest-name">Arena 13:00</div>
+                        </div>
+                    </div>
 
-            <div class="quest-item" data-quest="arena2">
-                <div class="quest-checkbox"></div>
-                <div class="quest-info">
-                    <div class="quest-name">
-                        Arena 19:00
-                        <span class="quest-tag">PVP</span>
+                    <div class="quest-item" data-quest="arena2">
+                        <div class="quest-checkbox"></div>
+                        <div class="quest-info">
+                            <div class="quest-name">Arena 19:00</div>
+                        </div>
+                    </div>
+
+                    <div class="quest-item" data-quest="arena3">
+                        <div class="quest-checkbox"></div>
+                        <div class="quest-info">
+                            <div class="quest-name">Arena 20:30</div>
+                        </div>
+                    </div>
+
+                    <div class="quest-item" data-quest="arena4">
+                        <div class="quest-checkbox"></div>
+                        <div class="quest-info">
+                            <div class="quest-name">Arena 23:00</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="quest-item" data-quest="arena3">
-                <div class="quest-checkbox"></div>
-                <div class="quest-info">
-                    <div class="quest-name">
-                        Arena 20:30
-                        <span class="quest-tag">PVP</span>
+            <!-- Dropdown de Eventos -->
+            <div class="quest-dropdown">
+                <div class="quest-dropdown-header" onclick="toggleDropdown('eventos-dropdown')">
+                    <div class="quest-dropdown-title">
+                        🎃 Eventos Halloween 👻
+                        <span class="quest-tag halloween-tag">HALLOWEEN</span>
                     </div>
+                    <div class="quest-dropdown-arrow" id="eventos-arrow">▼</div>
                 </div>
-            </div>
-
-            <div class="quest-item" data-quest="arena4">
-                <div class="quest-checkbox"></div>
-                <div class="quest-info">
-                    <div class="quest-name">
-                        Arena 23:00
-                        <span class="quest-tag">PVP</span>
+                <div class="quest-dropdown-content" id="eventos-dropdown">
+                    <div class="quest-item" data-quest="evento1">
+                        <div class="quest-checkbox"></div>
+                        <div class="quest-info">
+                            <div class="quest-name">
+                                Evento 11:00
+                                <span class="quest-tag halloween-tag">HALLOWEEN</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="quest-item" data-quest="evento1">
-                <div class="quest-checkbox"></div>
-                <div class="quest-info">
-                    <div class="quest-name">
-                        Evento 11:00
-                        <span class="quest-tag">EVENT</span>
+                    <div class="quest-item" data-quest="evento2">
+                        <div class="quest-checkbox"></div>
+                        <div class="quest-info">
+                            <div class="quest-name">
+                                Evento 15:00
+                                <span class="quest-tag halloween-tag">HALLOWEEN</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="quest-item" data-quest="evento2">
-                <div class="quest-checkbox"></div>
-                <div class="quest-info">
-                    <div class="quest-name">
-                        Evento 15:00
-                        <span class="quest-tag">EVENT</span>
+                    <div class="quest-item" data-quest="evento3">
+                        <div class="quest-checkbox"></div>
+                        <div class="quest-info">
+                            <div class="quest-name">
+                                Evento 18:00
+                                <span class="quest-tag halloween-tag">HALLOWEEN</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="quest-item" data-quest="evento3">
-                <div class="quest-checkbox"></div>
-                <div class="quest-info">
-                    <div class="quest-name">
-                        Evento 18:00
-                        <span class="quest-tag">EVENT</span>
+                    <div class="quest-item" data-quest="evento4">
+                        <div class="quest-checkbox"></div>
+                        <div class="quest-info">
+                            <div class="quest-name">
+                                Evento 22:00
+                                <span class="quest-tag halloween-tag">HALLOWEEN</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="quest-item" data-quest="evento4">
-                <div class="quest-checkbox"></div>
-                <div class="quest-info">
-                    <div class="quest-name">
-                        Evento 22:00
-                        <span class="quest-tag">EVENT</span>
+                    <!-- Eventos de Teleporte -->
+                    <div class="quest-item" data-quest="teleporte1">
+                        <div class="quest-checkbox"></div>
+                        <div class="quest-info">
+                            <div class="quest-name">
+                                Teleporte 12:00-13:00
+                                <span class="quest-tag teleporte-tag">TELEPORTE</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quest-item" data-quest="teleporte2">
+                        <div class="quest-checkbox"></div>
+                        <div class="quest-info">
+                            <div class="quest-name">
+                                Teleporte 20:00-21:00
+                                <span class="quest-tag teleporte-tag">TELEPORTE</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quest-item" data-quest="teleporte3">
+                        <div class="quest-checkbox"></div>
+                        <div class="quest-info">
+                            <div class="quest-name">
+                                Teleporte Sábado 10:00-11:00
+                                <span class="quest-tag teleporte-tag">TELEPORTE</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quest-item" data-quest="teleporte4">
+                        <div class="quest-checkbox"></div>
+                        <div class="quest-info">
+                            <div class="quest-name">
+                                Teleporte Sábado 14:00-15:00
+                                <span class="quest-tag teleporte-tag">TELEPORTE</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quest-item" data-quest="teleporte5">
+                        <div class="quest-checkbox"></div>
+                        <div class="quest-info">
+                            <div class="quest-name">
+                                Teleporte Domingo 16:00-17:00
+                                <span class="quest-tag teleporte-tag">TELEPORTE</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quest-item" data-quest="teleporte6">
+                        <div class="quest-checkbox"></div>
+                        <div class="quest-info">
+                            <div class="quest-name">
+                                Teleporte Domingo 21:00-22:00
+                                <span class="quest-tag teleporte-tag">TELEPORTE</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quest-item" data-quest="immaturity">
+                        <div class="quest-checkbox"></div>
+                        <div class="quest-info">
+                            <div class="quest-name">
+                                Immaturity Angel
+                                <span class="quest-tag halloween-tag">HALLOWEEN</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1321,10 +1519,16 @@
             { id: 'arena2', name: 'Arena 19:00', hour: 19, minute: 0 },
             { id: 'arena3', name: 'Arena 20:30', hour: 20, minute: 30 },
             { id: 'arena4', name: 'Arena 23:00', hour: 23, minute: 0 },
-            { id: 'evento1', name: 'Evento 11:00', hour: 11, minute: 0 },
-            { id: 'evento2', name: 'Evento 15:00', hour: 15, minute: 0 },
-            { id: 'evento3', name: 'Evento 18:00', hour: 18, minute: 0 },
-            { id: 'evento4', name: 'Evento 22:00', hour: 22, minute: 0 }
+            { id: 'evento1', name: 'Evento Halloween 11:00', hour: 11, minute: 0 },
+            { id: 'evento2', name: 'Evento Halloween 15:00', hour: 15, minute: 0 },
+            { id: 'evento3', name: 'Evento Halloween 18:00', hour: 18, minute: 0 },
+            { id: 'evento4', name: 'Evento Halloween 22:00', hour: 22, minute: 0 },
+            { id: 'teleporte1', name: 'Evento Teleporte 12:00', hour: 12, minute: 0 },
+            { id: 'teleporte2', name: 'Evento Teleporte 20:00', hour: 20, minute: 0 },
+            { id: 'teleporte3', name: 'Evento Teleporte Sábado 10:00', hour: 10, minute: 0, days: [6] },
+            { id: 'teleporte4', name: 'Evento Teleporte Sábado 14:00', hour: 14, minute: 0, days: [6] },
+            { id: 'teleporte5', name: 'Evento Teleporte Domingo 16:00', hour: 16, minute: 0, days: [0] },
+            { id: 'teleporte6', name: 'Evento Teleporte Domingo 21:00', hour: 21, minute: 0, days: [0] }
         ];
 
         function playNotificationSound() {
@@ -1387,6 +1591,7 @@
             const currentHour = now.getHours();
             const currentMinute = now.getMinutes();
             const currentTime = currentHour * 60 + currentMinute;
+            const currentDay = now.getDay(); // 0=Domingo, 1=Segunda, ..., 6=Sábado
             const today = now.toDateString();
             
             // Reseta notificações no início do dia
@@ -1396,6 +1601,11 @@
             }
             
             questSchedule.forEach(quest => {
+                // Verifica se o evento tem restrição de dias
+                if (quest.days && !quest.days.includes(currentDay)) {
+                    return; // Pula este evento se não for o dia correto
+                }
+                
                 const questTime = quest.hour * 60 + quest.minute;
                 const notifyTime = questTime - 5; // 5 minutos antes
                 const endNotifyTime = questTime + 5; // Até 5 minutos depois
@@ -1574,8 +1784,14 @@
             
             const now = new Date();
             const currentTime = now.getHours() * 60 + now.getMinutes();
+            const currentDay = now.getDay(); // 0=Domingo, 1=Segunda, ..., 6=Sábado
             
             questSchedule.forEach(quest => {
+                // Verifica se o evento tem restrição de dias
+                if (quest.days && !quest.days.includes(currentDay)) {
+                    return; // Pula este evento se não for o dia correto
+                }
+                
                 const questTime = quest.hour * 60 + quest.minute;
                 const notifyTime = questTime - 5; // 5 minutos antes
                 
@@ -2010,6 +2226,7 @@
         setInterval(updateTimer, 1000);
         setInterval(checkDailyReset, 60000);
         setInterval(checkQuestNotifications, 60000); // Verifica notificações a cada minuto
+        setInterval(filterEventsByDay, 60 * 60 * 1000); // Atualiza filtro de eventos a cada hora
         checkQuestNotifications(); // Verifica imediatamente ao carregar
 
         // Registro do Service Worker para PWA
@@ -2174,12 +2391,29 @@
         document.addEventListener('DOMContentLoaded', function() {
             generateQRCode();
             setupNotificationToggle();
+            filterEventsByDay(); // Filtra eventos por dia
             
             // Inicializa notificações push após um pequeno delay
             setTimeout(() => {
                 scheduleNextNotifications();
             }, 2000);
         });
+
+        // === CONTROLE DE DROPDOWNS ===
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            const arrow = document.getElementById(dropdownId.replace('-dropdown', '-arrow'));
+            
+            if (dropdown.classList.contains('open')) {
+                // Fecha o dropdown
+                dropdown.classList.remove('open');
+                arrow.classList.remove('rotated');
+            } else {
+                // Abre o dropdown
+                dropdown.classList.add('open');
+                arrow.classList.add('rotated');
+            }
+        }
 
         // === PWA INSTALLATION SYSTEM ===
         let deferredPrompt;
@@ -2446,6 +2680,34 @@
             } else {
                 showAchievement(text, type);
             }
+        }
+
+        // Função para mostrar apenas eventos do dia atual
+        function filterEventsByDay() {
+            const now = new Date();
+            const currentDay = now.getDay(); // 0=Domingo, 1=Segunda, ..., 6=Sábado
+            
+            // Mapeamento dos eventos por dias da semana
+            const eventDayMapping = {
+                'teleporte3': [6], // Sábado
+                'teleporte4': [6], // Sábado
+                'teleporte5': [0], // Domingo
+                'teleporte6': [0]  // Domingo
+                // eventos diários (teleporte1, teleporte2) e halloween aparecem todos os dias
+            };
+            
+            // Esconde/mostra eventos baseado no dia
+            Object.keys(eventDayMapping).forEach(questId => {
+                const questElement = document.querySelector(`[data-quest="${questId}"]`);
+                if (questElement) {
+                    const allowedDays = eventDayMapping[questId];
+                    if (allowedDays.includes(currentDay)) {
+                        questElement.style.display = 'flex';
+                    } else {
+                        questElement.style.display = 'none';
+                    }
+                }
+            });
         }
 
     </script>
