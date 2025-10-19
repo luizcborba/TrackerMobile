@@ -182,7 +182,8 @@ self.addEventListener('activate', function(event) {
 });
 
 // Horários das arenas e eventos
-const questSchedule = [
+// Schedule base com arenas e eventos Halloween
+let questSchedule = [
   { id: 'arena1', name: 'Arena 13:00', hour: 13, minute: 0 },
   { id: 'arena2', name: 'Arena 19:00', hour: 19, minute: 0 },
   { id: 'arena3', name: 'Arena 20:30', hour: 20, minute: 30 },
@@ -190,17 +191,61 @@ const questSchedule = [
   { id: 'evento1', name: 'Evento Halloween 11:00', hour: 11, minute: 0 },
   { id: 'evento2', name: 'Evento Halloween 15:00', hour: 15, minute: 0 },
   { id: 'evento3', name: 'Evento Halloween 18:00', hour: 18, minute: 0 },
-  { id: 'evento4', name: 'Evento Halloween 22:00', hour: 22, minute: 0 },
-  { id: 'teleporte1', name: 'Evento Teleporte 12:00', hour: 12, minute: 0 },
-  { id: 'teleporte2', name: 'Evento Teleporte 20:00', hour: 20, minute: 0 },
-  { id: 'teleporte3', name: 'Evento Teleporte Sábado 10:00', hour: 10, minute: 0, days: [6] }, // Sábado
-  { id: 'teleporte4', name: 'Evento Teleporte Sábado 14:00', hour: 14, minute: 0, days: [6] }, // Sábado
-  { id: 'teleporte5', name: 'Evento Teleporte Domingo 16:00', hour: 16, minute: 0, days: [0] }, // Domingo
-  { id: 'teleporte6', name: 'Evento Teleporte Domingo 21:00', hour: 21, minute: 0, days: [0] }  // Domingo
+  { id: 'evento4', name: 'Evento Halloween 22:00', hour: 22, minute: 0 }
 ];
+
+// Função para adicionar eventos de teleporte dinâmicos
+function addTodayTeleportEvents() {
+  const now = new Date();
+  const currentDay = now.getDay();
+  
+  // Remove eventos de teleporte existentes
+  questSchedule = questSchedule.filter(quest => !quest.id.includes('teleporte'));
+  
+  // Definição dos horários de teleporte por dia da semana
+  const teleportSchedule = {
+    0: [ // Domingo
+      { id: "teleporte_domingo_1", name: "Evento Teleporte Domingo 16:00", hour: 16, minute: 0 },
+      { id: "teleporte_domingo_2", name: "Evento Teleporte Domingo 21:00", hour: 21, minute: 0 }
+    ],
+    1: [ // Segunda-feira
+      { id: "teleporte_segunda_1", name: "Evento Teleporte 12:00", hour: 12, minute: 0 },
+      { id: "teleporte_segunda_2", name: "Evento Teleporte 20:00", hour: 20, minute: 0 }
+    ],
+    2: [ // Terça-feira
+      { id: "teleporte_terca_1", name: "Evento Teleporte 12:00", hour: 12, minute: 0 },
+      { id: "teleporte_terca_2", name: "Evento Teleporte 20:00", hour: 20, minute: 0 }
+    ],
+    3: [ // Quarta-feira
+      { id: "teleporte_quarta_1", name: "Evento Teleporte 12:00", hour: 12, minute: 0 },
+      { id: "teleporte_quarta_2", name: "Evento Teleporte 20:00", hour: 20, minute: 0 }
+    ],
+    4: [ // Quinta-feira
+      { id: "teleporte_quinta_1", name: "Evento Teleporte 12:00", hour: 12, minute: 0 },
+      { id: "teleporte_quinta_2", name: "Evento Teleporte 20:00", hour: 20, minute: 0 }
+    ],
+    5: [ // Sexta-feira
+      { id: "teleporte_sexta_1", name: "Evento Teleporte 12:00", hour: 12, minute: 0 },
+      { id: "teleporte_sexta_2", name: "Evento Teleporte 20:00", hour: 20, minute: 0 }
+    ],
+    6: [ // Sábado
+      { id: "teleporte_sabado_1", name: "Evento Teleporte Sábado 10:00", hour: 10, minute: 0 },
+      { id: "teleporte_sabado_2", name: "Evento Teleporte Sábado 14:00", hour: 14, minute: 0 }
+    ]
+  };
+  
+  // Adiciona eventos de hoje
+  const todayEvents = teleportSchedule[currentDay];
+  if (todayEvents) {
+    questSchedule.push(...todayEvents);
+  }
+}
 
 function scheduleQuestNotifications() {
   console.log('Service Worker: Agendando notificações...');
+  
+  // Atualiza eventos de teleporte para hoje
+  addTodayTeleportEvents();
   
   // Limpa timers anteriores
   if (self.questTimers) {
@@ -214,22 +259,11 @@ function scheduleQuestNotifications() {
   questSchedule.forEach(quest => {
     const questTime = quest.hour * 60 + quest.minute;
     
-    // Verifica se o evento tem restrição de dias
-    if (quest.days) {
-      // Agenda para os próximos 7 dias
-      for (let i = 0; i < 7; i++) {
-        const checkDate = new Date(now);
-        checkDate.setDate(checkDate.getDate() + i);
-        
-        if (quest.days.includes(checkDate.getDay())) {
-          scheduleNotificationForTime(quest, questTime, checkDate);
-        }
-      }
-    } else {
-      // Agenda para hoje se ainda não passou
-      scheduleNotificationForTime(quest, questTime, now);
-      
-      // Agenda para amanhã
+    // Agenda para hoje se ainda não passou
+    scheduleNotificationForTime(quest, questTime, now);
+    
+    // Agenda para amanhã (para eventos não-teleporte, pois teleporte é atualizado dinamicamente)
+    if (!quest.id.includes('teleporte')) {
       const tomorrow = new Date(now);
       tomorrow.setDate(tomorrow.getDate() + 1);
       scheduleNotificationForTime(quest, questTime, tomorrow);

@@ -1354,62 +1354,22 @@
                         </div>
                     </div>
 
-                    <!-- Eventos de Teleporte -->
-                    <div class="quest-item" data-quest="teleporte1">
+                    <!-- Eventos de Teleporte Dinâmicos -->
+                    <div class="quest-item" data-quest="teleporte_diario_1" id="teleporte-slot-1">
                         <div class="quest-checkbox"></div>
                         <div class="quest-info">
                             <div class="quest-name">
-                                Teleporte 12:00-13:00
+                                <span id="teleporte-nome-1">Teleporte 12:00-13:00</span>
                                 <span class="quest-tag teleporte-tag">TELEPORTE</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="quest-item" data-quest="teleporte2">
+                    <div class="quest-item" data-quest="teleporte_diario_2" id="teleporte-slot-2">
                         <div class="quest-checkbox"></div>
                         <div class="quest-info">
                             <div class="quest-name">
-                                Teleporte 20:00-21:00
-                                <span class="quest-tag teleporte-tag">TELEPORTE</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="quest-item" data-quest="teleporte3">
-                        <div class="quest-checkbox"></div>
-                        <div class="quest-info">
-                            <div class="quest-name">
-                                Teleporte Sábado 10:00-11:00
-                                <span class="quest-tag teleporte-tag">TELEPORTE</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="quest-item" data-quest="teleporte4">
-                        <div class="quest-checkbox"></div>
-                        <div class="quest-info">
-                            <div class="quest-name">
-                                Teleporte Sábado 14:00-15:00
-                                <span class="quest-tag teleporte-tag">TELEPORTE</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="quest-item" data-quest="teleporte5">
-                        <div class="quest-checkbox"></div>
-                        <div class="quest-info">
-                            <div class="quest-name">
-                                Teleporte Domingo 16:00-17:00
-                                <span class="quest-tag teleporte-tag">TELEPORTE</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="quest-item" data-quest="teleporte6">
-                        <div class="quest-checkbox"></div>
-                        <div class="quest-info">
-                            <div class="quest-name">
-                                Teleporte Domingo 21:00-22:00
+                                <span id="teleporte-nome-2">Teleporte 20:00-21:00</span>
                                 <span class="quest-tag teleporte-tag">TELEPORTE</span>
                             </div>
                         </div>
@@ -1522,13 +1482,8 @@
             { id: 'evento1', name: 'Evento Halloween 11:00', hour: 11, minute: 0 },
             { id: 'evento2', name: 'Evento Halloween 15:00', hour: 15, minute: 0 },
             { id: 'evento3', name: 'Evento Halloween 18:00', hour: 18, minute: 0 },
-            { id: 'evento4', name: 'Evento Halloween 22:00', hour: 22, minute: 0 },
-            { id: 'teleporte1', name: 'Evento Teleporte 12:00', hour: 12, minute: 0 },
-            { id: 'teleporte2', name: 'Evento Teleporte 20:00', hour: 20, minute: 0 },
-            { id: 'teleporte3', name: 'Evento Teleporte Sábado 10:00', hour: 10, minute: 0, days: [6] },
-            { id: 'teleporte4', name: 'Evento Teleporte Sábado 14:00', hour: 14, minute: 0, days: [6] },
-            { id: 'teleporte5', name: 'Evento Teleporte Domingo 16:00', hour: 16, minute: 0, days: [0] },
-            { id: 'teleporte6', name: 'Evento Teleporte Domingo 21:00', hour: 21, minute: 0, days: [0] }
+            { id: 'evento4', name: 'Evento Halloween 22:00', hour: 22, minute: 0 }
+            // Eventos de teleporte são adicionados dinamicamente pela função updateTeleportEvents()
         ];
 
         function playNotificationSound() {
@@ -1601,11 +1556,6 @@
             }
             
             questSchedule.forEach(quest => {
-                // Verifica se o evento tem restrição de dias
-                if (quest.days && !quest.days.includes(currentDay)) {
-                    return; // Pula este evento se não for o dia correto
-                }
-                
                 const questTime = quest.hour * 60 + quest.minute;
                 const notifyTime = questTime - 5; // 5 minutos antes
                 const endNotifyTime = questTime + 5; // Até 5 minutos depois
@@ -1784,14 +1734,8 @@
             
             const now = new Date();
             const currentTime = now.getHours() * 60 + now.getMinutes();
-            const currentDay = now.getDay(); // 0=Domingo, 1=Segunda, ..., 6=Sábado
             
             questSchedule.forEach(quest => {
-                // Verifica se o evento tem restrição de dias
-                if (quest.days && !quest.days.includes(currentDay)) {
-                    return; // Pula este evento se não for o dia correto
-                }
-                
                 const questTime = quest.hour * 60 + quest.minute;
                 const notifyTime = questTime - 5; // 5 minutos antes
                 
@@ -2226,7 +2170,7 @@
         setInterval(updateTimer, 1000);
         setInterval(checkDailyReset, 60000);
         setInterval(checkQuestNotifications, 60000); // Verifica notificações a cada minuto
-        setInterval(filterEventsByDay, 60 * 60 * 1000); // Atualiza filtro de eventos a cada hora
+        setInterval(updateTeleportEvents, 60 * 60 * 1000); // Atualiza eventos de teleporte a cada hora
         checkQuestNotifications(); // Verifica imediatamente ao carregar
 
         // Registro do Service Worker para PWA
@@ -2391,7 +2335,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             generateQRCode();
             setupNotificationToggle();
-            filterEventsByDay(); // Filtra eventos por dia
+            updateTeleportEvents(); // Atualiza eventos de teleporte para o dia atual
             
             // Inicializa notificações push após um pequeno delay
             setTimeout(() => {
@@ -2682,32 +2626,97 @@
             }
         }
 
-        // Função para mostrar apenas eventos do dia atual
-        function filterEventsByDay() {
+        // Função para mostrar eventos de teleporte do dia atual
+        function updateTeleportEvents() {
             const now = new Date();
             const currentDay = now.getDay(); // 0=Domingo, 1=Segunda, ..., 6=Sábado
             
-            // Mapeamento dos eventos por dias da semana
-            const eventDayMapping = {
-                'teleporte3': [6], // Sábado
-                'teleporte4': [6], // Sábado
-                'teleporte5': [0], // Domingo
-                'teleporte6': [0]  // Domingo
-                // eventos diários (teleporte1, teleporte2) e halloween aparecem todos os dias
+            // Definição dos horários de teleporte por dia da semana
+            const teleportSchedule = {
+                0: [ // Domingo
+                    { name: "Teleporte Domingo 16:00-17:00", hour: 16, minute: 0, id: "teleporte_domingo_1" },
+                    { name: "Teleporte Domingo 21:00-22:00", hour: 21, minute: 0, id: "teleporte_domingo_2" }
+                ],
+                1: [ // Segunda-feira
+                    { name: "Teleporte 12:00-13:00", hour: 12, minute: 0, id: "teleporte_segunda_1" },
+                    { name: "Teleporte 20:00-21:00", hour: 20, minute: 0, id: "teleporte_segunda_2" }
+                ],
+                2: [ // Terça-feira
+                    { name: "Teleporte 12:00-13:00", hour: 12, minute: 0, id: "teleporte_terca_1" },
+                    { name: "Teleporte 20:00-21:00", hour: 20, minute: 0, id: "teleporte_terca_2" }
+                ],
+                3: [ // Quarta-feira
+                    { name: "Teleporte 12:00-13:00", hour: 12, minute: 0, id: "teleporte_quarta_1" },
+                    { name: "Teleporte 20:00-21:00", hour: 20, minute: 0, id: "teleporte_quarta_2" }
+                ],
+                4: [ // Quinta-feira
+                    { name: "Teleporte 12:00-13:00", hour: 12, minute: 0, id: "teleporte_quinta_1" },
+                    { name: "Teleporte 20:00-21:00", hour: 20, minute: 0, id: "teleporte_quinta_2" }
+                ],
+                5: [ // Sexta-feira
+                    { name: "Teleporte 12:00-13:00", hour: 12, minute: 0, id: "teleporte_sexta_1" },
+                    { name: "Teleporte 20:00-21:00", hour: 20, minute: 0, id: "teleporte_sexta_2" }
+                ],
+                6: [ // Sábado
+                    { name: "Teleporte Sábado 10:00-11:00", hour: 10, minute: 0, id: "teleporte_sabado_1" },
+                    { name: "Teleporte Sábado 14:00-15:00", hour: 14, minute: 0, id: "teleporte_sabado_2" }
+                ]
             };
             
-            // Esconde/mostra eventos baseado no dia
-            Object.keys(eventDayMapping).forEach(questId => {
-                const questElement = document.querySelector(`[data-quest="${questId}"]`);
-                if (questElement) {
-                    const allowedDays = eventDayMapping[questId];
-                    if (allowedDays.includes(currentDay)) {
-                        questElement.style.display = 'flex';
-                    } else {
-                        questElement.style.display = 'none';
-                    }
+            const todayEvents = teleportSchedule[currentDay];
+            
+            // Atualiza os elementos de teleporte
+            const slot1 = document.getElementById('teleporte-slot-1');
+            const slot2 = document.getElementById('teleporte-slot-2');
+            const nome1 = document.getElementById('teleporte-nome-1');
+            const nome2 = document.getElementById('teleporte-nome-2');
+            
+            if (todayEvents && todayEvents.length >= 2) {
+                // Atualiza slot 1
+                slot1.setAttribute('data-quest', todayEvents[0].id);
+                nome1.textContent = todayEvents[0].name;
+                slot1.style.display = 'flex';
+                
+                // Atualiza slot 2
+                slot2.setAttribute('data-quest', todayEvents[1].id);
+                nome2.textContent = todayEvents[1].name;
+                slot2.style.display = 'flex';
+                
+                // Atualiza questSchedule global para notificações
+                updateTeleportInSchedule(todayEvents);
+            } else {
+                // Esconde slots se não houver eventos
+                slot1.style.display = 'none';
+                slot2.style.display = 'none';
+            }
+            
+            console.log(`🔮 Eventos de teleporte atualizados para ${getDayName(currentDay)}: ${todayEvents ? todayEvents.length : 0} eventos`);
+        }
+        
+        // Função para atualizar o cronograma global de quests
+        function updateTeleportInSchedule(todayEvents) {
+            // Remove eventos de teleporte antigos do schedule
+            for (let i = questSchedule.length - 1; i >= 0; i--) {
+                if (questSchedule[i].id && questSchedule[i].id.includes('teleporte')) {
+                    questSchedule.splice(i, 1);
                 }
+            }
+            
+            // Adiciona eventos de hoje
+            todayEvents.forEach(event => {
+                questSchedule.push({
+                    id: event.id,
+                    name: event.name,
+                    hour: event.hour,
+                    minute: event.minute
+                });
             });
+        }
+        
+        // Função auxiliar para obter nome do dia
+        function getDayName(dayIndex) {
+            const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+            return days[dayIndex];
         }
 
     </script>
