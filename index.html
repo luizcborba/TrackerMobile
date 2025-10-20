@@ -1521,11 +1521,24 @@
             if (data.notificationInterval) {
                 clearInterval(data.notificationInterval);
             }
+            
+            let pulseCount = 0;
+            const maxPulses = 3;
+            
             // Toca imediatamente
             playNotificationSound();
-            // Depois repete a cada 2 segundos para ser mais insistente
+            pulseCount++;
+            
+            // Depois repete mais 2 vezes (total de 3)
             data.notificationInterval = setInterval(() => {
-                playNotificationSound();
+                if (pulseCount < maxPulses) {
+                    playNotificationSound();
+                    pulseCount++;
+                } else {
+                    // Para após 3 pulsos
+                    clearInterval(data.notificationInterval);
+                    data.notificationInterval = null;
+                }
             }, 2000);
         }
 
@@ -1961,6 +1974,9 @@
                 popup.style.animation = ''; // Remove animação
                 closeBtn.style.display = 'none';
                 
+                // Marca automaticamente a checkbox da quest
+                markQuestAsCompleted(questId);
+                
                 // Marca como notificado para não repetir
                 const today = new Date().toDateString();
                 if (!data.notifiedQuests[today]) {
@@ -1970,6 +1986,33 @@
                 data.notifiedQuests[today][notificationKey] = true;
                 saveData();
             };
+        }
+        
+        // Função para marcar uma quest como completada
+        function markQuestAsCompleted(questId) {
+            // Verifica se a quest não estava completada antes
+            const wasCompleted = data.quests[questId];
+            
+            if (!wasCompleted) {
+                data.quests[questId] = true;
+                
+                // Adiciona XP
+                const now = new Date();
+                data.lastCompletedDate = now.toDateString();
+                addXP(10);
+                
+                // Verifica se todas as quests foram completadas
+                checkAllQuestsCompleted();
+                
+                // Verifica se alguma arena foi completada para parar notificações
+                checkArenaCompletion();
+                
+                // Atualiza a interface
+                updateUI();
+                saveData();
+                
+                console.log(`✅ Quest ${questId} marcada automaticamente como completada`);
+            }
         }
 
         function addXP(amount) {
@@ -2633,33 +2676,33 @@
             
             // Definição dos horários de teleporte por dia da semana
             const teleportSchedule = {
-                0: [ // Domingo
-                    { name: "Teleporte Domingo 16:00-17:00", hour: 16, minute: 0, id: "teleporte_domingo_1" },
-                    { name: "Teleporte Domingo 21:00-22:00", hour: 21, minute: 0, id: "teleporte_domingo_2" }
+                0: [ // Domingo (26/10)
+                    { name: "Teleporte Domingo 13:00-14:00", hour: 13, minute: 0, id: "teleporte_domingo_1" },
+                    { name: "Teleporte Domingo 15:00-16:00", hour: 15, minute: 0, id: "teleporte_domingo_2" }
                 ],
-                1: [ // Segunda-feira
-                    { name: "Teleporte 12:00-13:00", hour: 12, minute: 0, id: "teleporte_segunda_1" },
-                    { name: "Teleporte 20:00-21:00", hour: 20, minute: 0, id: "teleporte_segunda_2" }
+                1: [ // Segunda-feira (20/10)
+                    { name: "Teleporte Segunda 10:00-10:30", hour: 10, minute: 0, id: "teleporte_segunda_1" },
+                    { name: "Teleporte Segunda 19:30-20:00", hour: 19, minute: 30, id: "teleporte_segunda_2" }
                 ],
-                2: [ // Terça-feira
-                    { name: "Teleporte 12:00-13:00", hour: 12, minute: 0, id: "teleporte_terca_1" },
-                    { name: "Teleporte 20:00-21:00", hour: 20, minute: 0, id: "teleporte_terca_2" }
+                2: [ // Terça-feira (21/10)
+                    { name: "Teleporte Terça 15:30-16:00", hour: 15, minute: 30, id: "teleporte_terca_1" },
+                    { name: "Teleporte Terça 21:30-22:00", hour: 21, minute: 30, id: "teleporte_terca_2" }
                 ],
-                3: [ // Quarta-feira
-                    { name: "Teleporte 12:00-13:00", hour: 12, minute: 0, id: "teleporte_quarta_1" },
-                    { name: "Teleporte 20:00-21:00", hour: 20, minute: 0, id: "teleporte_quarta_2" }
+                3: [ // Quarta-feira (22/10)
+                    { name: "Teleporte Quarta 10:30-11:00", hour: 10, minute: 30, id: "teleporte_quarta_1" },
+                    { name: "Teleporte Quarta 18:30-19:00", hour: 18, minute: 30, id: "teleporte_quarta_2" }
                 ],
-                4: [ // Quinta-feira
-                    { name: "Teleporte 12:00-13:00", hour: 12, minute: 0, id: "teleporte_quinta_1" },
-                    { name: "Teleporte 20:00-21:00", hour: 20, minute: 0, id: "teleporte_quinta_2" }
+                4: [ // Quinta-feira (23/10)
+                    { name: "Teleporte Quinta 18:00-18:30", hour: 18, minute: 0, id: "teleporte_quinta_1" },
+                    { name: "Teleporte Quinta 21:30-22:00", hour: 21, minute: 30, id: "teleporte_quinta_2" }
                 ],
-                5: [ // Sexta-feira
-                    { name: "Teleporte 12:00-13:00", hour: 12, minute: 0, id: "teleporte_sexta_1" },
-                    { name: "Teleporte 20:00-21:00", hour: 20, minute: 0, id: "teleporte_sexta_2" }
+                5: [ // Sexta-feira (24/10)
+                    { name: "Teleporte Sexta 10:30-11:00", hour: 10, minute: 30, id: "teleporte_sexta_1" },
+                    { name: "Teleporte Sexta 18:30-19:00", hour: 18, minute: 30, id: "teleporte_sexta_2" }
                 ],
-                6: [ // Sábado
-                    { name: "Teleporte Sábado 10:00-11:00", hour: 10, minute: 0, id: "teleporte_sabado_1" },
-                    { name: "Teleporte Sábado 14:00-15:00", hour: 14, minute: 0, id: "teleporte_sabado_2" }
+                6: [ // Sábado (25/10)
+                    { name: "Teleporte Sábado 14:00-15:00", hour: 14, minute: 0, id: "teleporte_sabado_1" },
+                    { name: "Teleporte Sábado 16:00-17:00", hour: 16, minute: 0, id: "teleporte_sabado_2" }
                 ]
             };
             

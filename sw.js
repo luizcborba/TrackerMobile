@@ -204,33 +204,33 @@ function addTodayTeleportEvents() {
   
   // Definição dos horários de teleporte por dia da semana
   const teleportSchedule = {
-    0: [ // Domingo
-      { id: "teleporte_domingo_1", name: "Evento Teleporte Domingo 16:00", hour: 16, minute: 0 },
-      { id: "teleporte_domingo_2", name: "Evento Teleporte Domingo 21:00", hour: 21, minute: 0 }
+    0: [ // Domingo (26/10)
+      { id: "teleporte_domingo_1", name: "Evento Teleporte Domingo 13:00", hour: 13, minute: 0 },
+      { id: "teleporte_domingo_2", name: "Evento Teleporte Domingo 15:00", hour: 15, minute: 0 }
     ],
-    1: [ // Segunda-feira
-      { id: "teleporte_segunda_1", name: "Evento Teleporte 12:00", hour: 12, minute: 0 },
-      { id: "teleporte_segunda_2", name: "Evento Teleporte 20:00", hour: 20, minute: 0 }
+    1: [ // Segunda-feira (20/10)
+      { id: "teleporte_segunda_1", name: "Evento Teleporte Segunda 10:00", hour: 10, minute: 0 },
+      { id: "teleporte_segunda_2", name: "Evento Teleporte Segunda 19:30", hour: 19, minute: 30 }
     ],
-    2: [ // Terça-feira
-      { id: "teleporte_terca_1", name: "Evento Teleporte 12:00", hour: 12, minute: 0 },
-      { id: "teleporte_terca_2", name: "Evento Teleporte 20:00", hour: 20, minute: 0 }
+    2: [ // Terça-feira (21/10)
+      { id: "teleporte_terca_1", name: "Evento Teleporte Terça 15:30", hour: 15, minute: 30 },
+      { id: "teleporte_terca_2", name: "Evento Teleporte Terça 21:30", hour: 21, minute: 30 }
     ],
-    3: [ // Quarta-feira
-      { id: "teleporte_quarta_1", name: "Evento Teleporte 12:00", hour: 12, minute: 0 },
-      { id: "teleporte_quarta_2", name: "Evento Teleporte 20:00", hour: 20, minute: 0 }
+    3: [ // Quarta-feira (22/10)
+      { id: "teleporte_quarta_1", name: "Evento Teleporte Quarta 10:30", hour: 10, minute: 30 },
+      { id: "teleporte_quarta_2", name: "Evento Teleporte Quarta 18:30", hour: 18, minute: 30 }
     ],
-    4: [ // Quinta-feira
-      { id: "teleporte_quinta_1", name: "Evento Teleporte 12:00", hour: 12, minute: 0 },
-      { id: "teleporte_quinta_2", name: "Evento Teleporte 20:00", hour: 20, minute: 0 }
+    4: [ // Quinta-feira (23/10)
+      { id: "teleporte_quinta_1", name: "Evento Teleporte Quinta 18:00", hour: 18, minute: 0 },
+      { id: "teleporte_quinta_2", name: "Evento Teleporte Quinta 21:30", hour: 21, minute: 30 }
     ],
-    5: [ // Sexta-feira
-      { id: "teleporte_sexta_1", name: "Evento Teleporte 12:00", hour: 12, minute: 0 },
-      { id: "teleporte_sexta_2", name: "Evento Teleporte 20:00", hour: 20, minute: 0 }
+    5: [ // Sexta-feira (24/10)
+      { id: "teleporte_sexta_1", name: "Evento Teleporte Sexta 10:30", hour: 10, minute: 30 },
+      { id: "teleporte_sexta_2", name: "Evento Teleporte Sexta 18:30", hour: 18, minute: 30 }
     ],
-    6: [ // Sábado
-      { id: "teleporte_sabado_1", name: "Evento Teleporte Sábado 10:00", hour: 10, minute: 0 },
-      { id: "teleporte_sabado_2", name: "Evento Teleporte Sábado 14:00", hour: 14, minute: 0 }
+    6: [ // Sábado (25/10)
+      { id: "teleporte_sabado_1", name: "Evento Teleporte Sábado 14:00", hour: 14, minute: 0 },
+      { id: "teleporte_sabado_2", name: "Evento Teleporte Sábado 16:00", hour: 16, minute: 0 }
     ]
   };
   
