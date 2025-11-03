@@ -98,7 +98,7 @@ self.addEventListener('push', function(event) {
   if (event.data) {
     const data = event.data.json();
     const options = {
-      body: data.body || '🎃 Nova notificação do WYD Quest Tracker! 👻',
+      body: data.body || '� Nova notificação do WYD Quest Tracker — LOKI!',
       icon: './icon-192x192.png',
       badge: './icon-72x72.png',
       vibrate: [200, 100, 200, 100, 200],
@@ -124,7 +124,7 @@ self.addEventListener('push', function(event) {
     };
 
     event.waitUntil(
-      self.registration.showNotification(data.title || '🎃 WYD Quest Tracker 👻', options)
+      self.registration.showNotification(data.title || '� WYD Quest Tracker — LOKI', options)
     );
   }
 });
@@ -182,16 +182,16 @@ self.addEventListener('activate', function(event) {
 });
 
 // Horários das arenas e eventos
-// Schedule base com arenas e eventos Halloween
+// Schedule base com arenas e eventos (neutro)
 let questSchedule = [
   { id: 'arena1', name: 'Arena 13:00', hour: 13, minute: 0 },
   { id: 'arena2', name: 'Arena 19:00', hour: 19, minute: 0 },
   { id: 'arena3', name: 'Arena 20:30', hour: 20, minute: 30 },
   { id: 'arena4', name: 'Arena 23:00', hour: 23, minute: 0 },
-  { id: 'evento1', name: 'Evento Halloween 11:00', hour: 11, minute: 0 },
-  { id: 'evento2', name: 'Evento Halloween 15:00', hour: 15, minute: 0 },
-  { id: 'evento3', name: 'Evento Halloween 18:00', hour: 18, minute: 0 },
-  { id: 'evento4', name: 'Evento Halloween 22:00', hour: 22, minute: 0 }
+  { id: 'evento1', name: 'Evento 11:00', hour: 11, minute: 0 },
+  { id: 'evento2', name: 'Evento 15:00', hour: 15, minute: 0 },
+  { id: 'evento3', name: 'Evento 18:00', hour: 18, minute: 0 },
+  { id: 'evento4', name: 'Evento 22:00', hour: 22, minute: 0 }
 ];
 
 // Função para adicionar eventos de teleporte dinâmicos
@@ -302,10 +302,10 @@ function showQuestNotification(quest) {
   
   if (currentTime < questTime) {
     const minutesLeft = questTime - currentTime;
-    title = '⏰ WYD Quest Tracker';
-    body = `🎃 ${quest.name} começa em ${minutesLeft} minuto${minutesLeft > 1 ? 's' : ''}! 👻`;
+    title = '🌀 WYD Quest Tracker — LOKI';
+    body = `� ${quest.name} começa em ${minutesLeft} minuto${minutesLeft > 1 ? 's' : ''}!`;
   } else {
-    title = '🚨 WYD Quest Tracker';
+    title = '🚨 WYD Quest Tracker — LOKI';
     body = `⚔️ ${quest.name} está começando AGORA! 🏆`;
   }
   
