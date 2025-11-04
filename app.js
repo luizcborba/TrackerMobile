@@ -385,7 +385,10 @@ function showQuestNotification(quest) {
     showAchievement(message);
     
     // Som de notificação
-    playNotificationSound();
+    // Não reproduz som para notificações de eventos
+    if (!quest.id || !quest.id.includes('evento')) {
+        playNotificationSound();
+    }
 }
 
 // Reproduzir som de conclusão

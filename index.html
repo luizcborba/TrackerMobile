@@ -1488,7 +1488,11 @@
                         message = `⚡ ${quest.name} começou há ${minutesPassed} minuto${minutesPassed > 1 ? 's' : ''}!`;
                     }
                     
-                    startNotificationLoop(); // Inicia loop de som
+                    // Som de notificação somente para arenas/outros — não tocar som para eventos
+                    if (!quest.id || !quest.id.includes('evento')) {
+                        startNotificationLoop(); // Inicia loop de som
+                    }
+                    // Mostra notificação persistente (visual) para todos os tipos
                     showPersistentNotification(message, quest.id);
                 }
             });
